@@ -1396,7 +1396,25 @@
             },
 
             // --- MAIN LOGIC ---
-            toggleAxes: function () { this.state.showAxes = !this.state.showAxes; document.getElementById('showAxes').checked = this.state.showAxes; document.getElementById('btnToggleAxes').classList.toggle('active', this.state.showAxes); this.updateRender(); },
+            toggleAxes: function () {
+                // On inverse l'état (vrai/faux)
+                this.state.showAxes = !this.state.showAxes;
+
+                // CORRECTION : On vérifie si la checkbox existe avant de la toucher
+                const chkBox = document.getElementById('showAxes');
+                if (chkBox) {
+                    chkBox.checked = this.state.showAxes;
+                }
+
+                // Mise à jour du bouton de la barre d'outils (qui lui existe toujours)
+                const btn = document.getElementById('btnToggleAxes');
+                if (btn) {
+                    btn.classList.toggle('active', this.state.showAxes);
+                }
+
+                // On redessine le canvas
+                this.updateRender();
+            },
             toggleMagnet: function () { this.state.magnetMode = !this.state.magnetMode; document.getElementById('btnToggleMagnet').classList.toggle('active', this.state.magnetMode); },
             toggleGridEditMode: function () {
                 this.state.isGridEditMode = !this.state.isGridEditMode;
