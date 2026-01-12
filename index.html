@@ -4,20 +4,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prof Studio - Version Finale (Axes Fléchés & Visibilité)</title>
+    <title>Prof Studio - Design Geosoft</title>
     <style>
+        /* --- 1. VARIABLES & THEME GEOSOFT --- */
         :root {
-            --header-bg: #2c3e50;
-            --header-text: #ecf0f1;
-            --sidebar-bg: #f8f9fa;
+            /* Palette principale */
+            --header-bg: hsla(0, 0%, 100%, 0.775);
+            --header-text: #2d3436;
+            --sidebar-bg: #ffffff;
+            --sidebar-border: #dfe6e9;
+
+            /* Couleurs d'accentuation (Violet moderne) */
+            --accent: #6c5ce7;
+            --accent-hover: #5649c0;
+            --accent-bg: #f0f0ff;
+            /* Fond léger pour les boutons actifs */
+
+            /* Utilitaires */
+            --danger: #d63031;
+            --success: #00b894;
+            --warning: #fdcb6e;
+            --text-muted: #636e72;
+
+            /* Dimensions & UI */
+            --header-height: 56px;
             --panel-width: 320px;
-            --accent: #3498db;
-            --accent-hover: #2980b9;
-            --border: #ddd;
-            --danger: #e74c3c;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --inactive: #95a5a6;
+            --radius: 8px;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
         }
 
         * {
@@ -28,92 +41,96 @@
             font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
             margin: 0;
             overflow: hidden;
-            color: #333;
+            color: #2d3436;
             user-select: none;
             display: flex;
             flex-direction: column;
             height: 100vh;
-            background: #666;
+            background: #f5f6fa;
         }
 
-        /* HEADER */
+        /* --- 2. HEADER --- */
         header {
-            height: 50px;
+            height: var(--header-height);
             background-color: var(--header-bg);
             color: var(--header-text);
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 15px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 0 20px;
+            box-shadow: 4px 2px 4px 2px rgba(0, 0, 0, 0.2);
             z-index: 30;
             flex-shrink: 0;
+            border-bottom: 1px solid var(--sidebar-border);
         }
 
         .header-section {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
 
         .app-title {
-            font-weight: bold;
-            font-size: 1.1rem;
-            color: #fff;
-            margin-right: 15px;
+            font-weight: 800;
+            font-size: 1.3rem;
+            color: var(--accent);
+            margin-right: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
 
         .toolbar-group {
             display: flex;
-            gap: 4px;
-            background: rgba(0, 0, 0, 0.2);
-            padding: 3px;
-            border-radius: 6px;
+            gap: 6px;
+            background: transparent;
+            padding: 0;
             align-items: center;
         }
 
         .divider {
             width: 1px;
-            height: 24px;
-            background: rgba(255, 255, 255, 0.2);
-            margin: 0 4px;
+            height: 28px;
+            background: #dfe6e9;
+            margin: 0 8px;
         }
 
+        /* Boutons Outils */
         .tool-btn {
-            width: 34px;
-            height: 34px;
-            border: none;
+            width: 38px;
+            height: 38px;
+            border: 1px solid transparent;
             background: transparent;
-            color: #bbb;
-            border-radius: 4px;
+            color: var(--text-muted);
+            border-radius: var(--radius);
             cursor: pointer;
             display: flex;
             align-items: center;
             justify-content: center;
-            transition: all 0.2s;
-            position: relative;
+            transition: all 0.2s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
 
         .tool-btn:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: var(--accent-bg);
+            color: var(--accent);
         }
 
         .tool-btn.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: var(--accent-bg);
+            color: var(--accent);
+            border-color: rgba(108, 92, 231, 0.2);
+            font-weight: bold;
         }
 
         .tool-btn.edit-mode-active {
-            background: var(--warning);
-            color: white;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            background: #fff3cd;
+            color: #e67e22;
+            border-color: #ffeeba;
         }
 
         .tool-btn svg {
-            width: 20px;
-            height: 20px;
+            width: 22px;
+            height: 22px;
             fill: currentColor;
             stroke: currentColor;
         }
@@ -129,16 +146,24 @@
             stroke: none;
         }
 
+        /* Select & Inputs Header */
         .header-select {
-            background: rgba(255, 255, 255, 0.15);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 5px 10px;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            background: #f1f2f6;
+            border: 1px solid transparent;
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: var(--radius);
+            font-size: 0.9rem;
+            font-weight: 500;
             outline: none;
             cursor: pointer;
-            max-width: 150px;
+            max-width: 160px;
+            transition: 0.2s;
+        }
+
+        .header-select:hover {
+            background: #dfe6e9;
+            color: #2d3436;
         }
 
         .header-select option {
@@ -146,56 +171,65 @@
             color: #333;
         }
 
-        .btn-export {
-            background-color: var(--success);
-            color: white;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 4px;
-            font-weight: bold;
+        /* Boutons Actions */
+        .btn-action,
+        .btn-export,
+        .btn-full {
+            font-family: inherit;
+            font-weight: 600;
+            border-radius: var(--radius);
             cursor: pointer;
-            font-size: 0.85rem;
+            transition: transform 0.1s, box-shadow 0.2s;
+            border: none;
+        }
+
+        .btn-action:active,
+        .btn-export:active {
+            transform: translateY(1px);
+        }
+
+        .btn-export {
+            background-color: var(--accent);
+            color: white;
+            padding: 8px 18px;
+            font-size: 0.9rem;
             display: flex;
             align-items: center;
-            gap: 6px;
+            gap: 8px;
+            box-shadow: 0 2px 5px rgba(108, 92, 231, 0.3);
         }
 
         .btn-export:hover {
-            background-color: #219150;
+            background-color: var(--accent-hover);
+            box-shadow: 0 4px 8px rgba(108, 92, 231, 0.4);
         }
 
         .btn-action {
-            background-color: var(--accent);
-            color: white;
-            border: none;
-            padding: 6px 12px;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
+            background-color: transparent;
+            color: var(--accent);
+            border: 1px solid var(--accent);
+            padding: 7px 14px;
             font-size: 0.85rem;
         }
 
         .btn-action:hover {
-            background-color: var(--accent-hover);
+            background-color: var(--accent-bg);
         }
 
         .btn-full {
             width: 100%;
-            padding: 8px;
-            border: none;
-            border-radius: 4px;
-            font-weight: bold;
-            cursor: pointer;
+            padding: 10px;
             margin-bottom: 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 5px;
+            gap: 8px;
         }
 
         .btn-accent {
             background: var(--accent);
             color: white;
+            box-shadow: 0 2px 5px rgba(108, 92, 231, 0.2);
         }
 
         .btn-accent:hover {
@@ -208,10 +242,10 @@
         }
 
         .btn-save:hover {
-            background: #219150;
+            background-color: #00a884;
         }
 
-        /* LAYOUT */
+        /* --- 3. LAYOUT --- */
         #main-container {
             display: flex;
             flex: 1;
@@ -226,96 +260,120 @@
             flex-direction: column;
             overflow-y: auto;
             z-index: 10;
+            box-shadow: 8px 0 10px rgba(0, 0, 0, 0.03);
         }
 
         #left-sidebar {
-            border-right: 1px solid var(--border);
+            border-right: 1px solid var(--sidebar-border);
+            box-shadow: 4px 2px 4px 2px rgba(0, 0, 0, 0.2);
         }
 
         #right-sidebar {
-            border-left: 1px solid var(--border);
-            background: white;
+            border-left: 1px solid var(--sidebar-border);
             width: 280px;
+            box-shadow: -4px 2px 4px 2px rgba(0, 0, 0, 0.2);
         }
 
         .sidebar-content {
-            padding: 15px;
+            padding: 20px;
         }
 
         .rs-header {
-            padding: 10px 15px;
-            background: #f1f2f6;
-            border-bottom: 1px solid #ddd;
-            font-weight: bold;
-            font-size: 0.85rem;
-            color: #666;
-            text-transform: uppercase;
+            padding: 15px 20px;
+            background: #fff;
+            border-bottom: 1px solid var(--sidebar-border);
+            font-weight: 800;
+            font-size: 0.9rem;
+            color: #2d3436;
+            letter-spacing: 0.5px;
         }
 
         .rs-footer {
-            padding: 10px;
-            border-top: 1px solid #ddd;
-            background: #f8f9fa;
-            height: 150px;
+            padding: 15px;
+            border-top: 1px solid var(--sidebar-border);
+            background: #fdfdfd;
+            height: 160px;
             display: flex;
             flex-direction: column;
         }
 
+        /* Headers dans la sidebar */
         h3 {
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             text-transform: uppercase;
-            border-bottom: 2px solid #ddd;
-            padding-bottom: 5px;
-            margin-top: 20px;
-            margin-bottom: 10px;
-            color: #555;
-            font-weight: 800;
-            letter-spacing: 0.5px;
+            color: var(--text-muted);
+            font-weight: 700;
+            letter-spacing: 0.8px;
+            margin: 25px 0 12px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        h3::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: #dfe6e9;
+            margin-left: 10px;
         }
 
         h3.edit-title {
-            color: var(--warning);
-            border-bottom-color: var(--warning);
-            margin-top: 0;
+            color: #e67e22;
         }
 
+        h3.edit-title::after {
+            background: #ffeaa7;
+        }
+
+        /* --- 4. FORMULAIRES --- */
         .control-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 8px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .input-group {
-            margin-bottom: 8px;
+            margin-bottom: 12px;
         }
 
         .input-group label {
             display: block;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             font-weight: 600;
-            color: #555;
-            margin-bottom: 3px;
+            color: #636e72;
+            margin-bottom: 6px;
         }
 
         input[type="number"],
         select,
         input[type="text"] {
             width: 100%;
-            padding: 6px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            font-size: 0.85rem;
+            padding: 8px 10px;
+            border: 1px solid #dfe6e9;
+            border-radius: 6px;
+            font-size: 0.9rem;
+            color: #2d3436;
+            transition: 0.2s;
             background: #fff;
+        }
+
+        input[type="number"]:focus,
+        select:focus,
+        input[type="text"]:focus {
+            border-color: var(--accent);
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.1);
         }
 
         input[type="color"] {
             width: 100%;
-            height: 32px;
-            padding: 2px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
+            height: 36px;
+            padding: 0;
+            border: none;
+            border-radius: 6px;
             cursor: pointer;
+            overflow: hidden;
         }
 
         input[type="range"] {
@@ -327,62 +385,56 @@
         .checkbox-wrapper {
             display: flex;
             align-items: center;
-            gap: 8px;
-            margin-bottom: 6px;
+            gap: 10px;
+            margin-bottom: 8px;
             padding: 4px 0;
+            cursor: pointer;
         }
 
         .checkbox-wrapper input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            margin: 0;
-            cursor: pointer;
+            width: 18px;
+            height: 18px;
             accent-color: var(--accent);
+            cursor: pointer;
+            margin: 0;
         }
 
         .checkbox-wrapper label {
-            font-size: 0.85rem;
-            color: #333;
-            font-weight: normal;
+            font-size: 0.9rem;
             cursor: pointer;
             margin: 0;
             user-select: none;
         }
 
-        /* LAYER ITEMS */
+        /* --- 5. LISTES --- */
         .layer-item {
             background: #fff;
-            border: 1px solid #e0e0e0;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 6px;
-            border-left: 4px solid #ccc;
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+            border-left-width: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.02);
         }
 
         .layer-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 8px;
-            font-weight: bold;
+            margin-bottom: 10px;
+            font-weight: 600;
             font-size: 0.85rem;
         }
 
         .layer-name-input {
             border: 1px solid transparent;
             border-bottom: 1px solid #ddd;
-            font-weight: bold;
+            font-weight: 600;
             width: 100%;
             padding: 2px;
             background: transparent;
         }
 
-        .layer-name-input:focus {
-            border-bottom-color: var(--accent);
-            outline: none;
-        }
-
-        /* OBJECT LIST */
         .obj-list {
             list-style: none;
             padding: 0;
@@ -390,30 +442,32 @@
         }
 
         .obj-item {
-            border-bottom: 1px solid #eee;
-            padding: 8px 12px;
+            border-bottom: 1px solid #f1f2f6;
+            padding: 10px 15px;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            transition: background 0.1s;
         }
 
         .obj-item:hover {
-            background: #f9f9f9;
+            background: #f8f9fa;
         }
 
         .obj-item.hidden-item {
-            opacity: 0.5;
-            background: #f0f0f0;
+            opacity: 0.6;
+            background: #fafafa;
+            font-style: italic;
         }
-
-        /* Style pour éléments cachés */
 
         .obj-info {
             flex: 1;
             overflow: hidden;
             white-space: nowrap;
             text-overflow: ellipsis;
+            font-weight: 500;
+            color: #2d3436;
         }
 
         .obj-actions {
@@ -433,18 +487,21 @@
             background: none;
             border: none;
             cursor: pointer;
-            font-size: 1rem;
-            padding: 0 4px;
-            color: #aaa;
-            transition: color 0.2s;
+            font-size: 1.1rem;
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: #b2bec3;
+            transition: all 0.2s;
         }
 
         .obj-btn:hover {
-            color: #333;
+            color: #2d3436;
+            background: #dfe6e9;
         }
 
         .obj-del:hover {
             color: var(--danger);
+            background: rgba(214, 48, 49, 0.1);
         }
 
         .obj-vis:hover {
@@ -452,47 +509,45 @@
         }
 
         .empty-msg {
-            font-size: 0.8rem;
-            color: #999;
-            font-style: italic;
-            padding: 15px;
+            padding: 30px;
             text-align: center;
+            color: #b2bec3;
+            font-size: 0.9rem;
+            font-style: italic;
         }
 
-        /* CANVAS AREA */
+        /* --- 6. CANVAS & OVERLAYS --- */
         #preview-container {
             flex: 1;
-            background: #888;
+            background: #dfe6e9;
             position: relative;
             overflow: hidden;
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: radial-gradient(#999 1px, transparent 1px);
+            background-image: radial-gradient(#b2bec3 1px, transparent 1px);
             background-size: 20px 20px;
         }
 
         #canvas-wrapper {
             position: relative;
             background: white;
-            box-shadow: 0 0 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+            border-radius: 4px;
             transform-origin: center center;
             transition: width 0.3s, height 0.3s;
         }
 
-        #tool-settings-panel,
-        #function-settings-panel {
-            display: none;
-        }
-
+        /* Handles */
         .resize-handle {
             position: absolute;
-            width: 12px;
-            height: 12px;
+            width: 14px;
+            height: 14px;
             background: var(--accent);
             border: 2px solid white;
             z-index: 20;
             border-radius: 50%;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
         }
 
         .resize-e {
@@ -517,17 +572,18 @@
 
         #dim-overlay {
             position: absolute;
-            bottom: 15px;
-            right: 15px;
-            background: rgba(0, 0, 0, 0.8);
+            bottom: 20px;
+            right: 20px;
+            background: rgba(45, 52, 54, 0.9);
             color: white;
-            padding: 6px 12px;
+            padding: 8px 16px;
             border-radius: 20px;
             font-size: 0.8rem;
+            font-weight: 600;
+            font-family: monospace;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.2s;
-            font-family: monospace;
             z-index: 100;
         }
 
@@ -535,13 +591,14 @@
             opacity: 1;
         }
 
+        /* Context Menu */
         #context-menu {
             position: absolute;
             display: none;
             background: white;
-            border: 1px solid #ccc;
-            border-radius: 6px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            border: 1px solid #dfe6e9;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             padding: 10px;
             width: 200px;
             z-index: 1000;
@@ -559,28 +616,26 @@
             margin-bottom: 8px;
         }
 
-        #context-menu button.danger {
+        #context-menu button {
             width: 100%;
-            padding: 6px;
-            color: white;
-            background: var(--danger);
+            padding: 8px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             cursor: pointer;
+            font-weight: 600;
+            color: white;
+        }
+
+        #context-menu button.danger {
+            background: var(--danger);
         }
 
         #context-menu button.edit {
-            width: 100%;
-            padding: 6px;
-            color: white;
             background: var(--accent);
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
             margin-bottom: 5px;
         }
 
-        /* MODALS */
+        /* --- 7. MODALS --- */
         .modal {
             position: fixed;
             top: 0;
@@ -592,14 +647,15 @@
             display: none;
             align-items: center;
             justify-content: center;
+            backdrop-filter: blur(2px);
         }
 
         .modal-content {
             background: white;
-            padding: 25px;
-            border-radius: 8px;
+            padding: 30px;
+            border-radius: 12px;
             width: 350px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
             max-height: 90vh;
             overflow-y: auto;
         }
@@ -614,29 +670,30 @@
 
         .modal-actions {
             display: flex;
-            gap: 10px;
-            margin-top: 20px;
+            gap: 12px;
+            margin-top: 25px;
         }
 
         .modal-btn {
             flex: 1;
-            padding: 10px;
+            padding: 12px;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        /* --- VISUAL TABLE BUILDER STYLES --- */
+        /* --- 8. TABLEUR VISUEL --- */
         #visualTableContainer {
             display: flex;
             align-items: flex-start;
             gap: 0;
             overflow-x: auto;
-            padding: 10px;
-            background: #f0f0f0;
-            border-radius: 6px;
-            border: 1px solid #ccc;
+            padding: 0;
+            background: #fff;
+            border-radius: 8px;
+            border: 1px solid #dfe6e9;
         }
 
         .tb-column {
@@ -644,7 +701,7 @@
             flex-direction: column;
             width: 80px;
             flex-shrink: 0;
-            border-right: 1px solid #eee;
+            border-right: 1px solid #f1f2f6;
             position: relative;
         }
 
@@ -655,12 +712,12 @@
         .tb-column.header-col {
             width: 100px;
             background: #f8f9fa;
-            border-right: 2px solid #ddd;
+            border-right: 1px solid #dfe6e9;
         }
 
         .tb-column.interval {
             width: 50px;
-            background: #fdfdfd;
+            background: #fff;
         }
 
         .tb-cell {
@@ -668,9 +725,10 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid #f1f2f6;
             font-size: 0.95rem;
             position: relative;
+            color: #2d3436;
         }
 
         .tb-column .tb-cell:last-child {
@@ -679,7 +737,7 @@
 
         .tb-header-label {
             font-weight: bold;
-            color: #555;
+            color: var(--text-muted);
         }
 
         .tb-input {
@@ -691,12 +749,12 @@
             font-family: monospace;
             font-size: 1.1rem;
             outline: none;
-            color: #2c3e50;
-            font-weight: bold;
+            color: var(--accent);
+            font-weight: 600;
         }
 
         .tb-input:focus {
-            background: #e8f5e9;
+            background: var(--accent-bg);
         }
 
         .tb-btn {
@@ -707,11 +765,11 @@
             cursor: pointer;
             font-weight: bold;
             font-size: 1.2rem;
-            color: #3498db;
+            color: var(--accent);
         }
 
         .tb-btn:hover {
-            background: #e3f2fd;
+            background: var(--accent-bg);
         }
 
         .btn-add-col {
@@ -719,7 +777,7 @@
             background: var(--success);
             color: white;
             border: none;
-            border-radius: 0 6px 6px 0;
+            border-radius: 0 8px 8px 0;
             cursor: pointer;
             font-size: 1.5rem;
             display: flex;
@@ -729,7 +787,7 @@
         }
 
         .btn-add-col:hover {
-            background: #219150;
+            background: #00a884;
         }
 
         .btn-del-col {
@@ -760,33 +818,31 @@
             display: none;
         }
 
-        /* INPUT FLOTTANT */
         #floatingInput {
             position: absolute;
             display: none;
             z-index: 5000;
             background: rgba(255, 255, 255, 0.95);
-            border: 1px solid var(--accent);
-            padding: 4px 8px;
+            border: 2px solid var(--accent);
+            padding: 6px 12px;
             font-family: Arial, sans-serif;
             font-size: 14px;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 6px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
             min-width: 150px;
             outline: none;
             transform: translate(-50%, -50%);
         }
 
-        /* HELP TABLE */
         .shortcuts-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             margin-top: 10px;
         }
 
         .shortcuts-table td {
-            padding: 5px;
+            padding: 8px 5px;
             border-bottom: 1px solid #eee;
         }
 
@@ -794,9 +850,9 @@
             font-family: monospace;
             font-weight: bold;
             color: var(--accent);
-            background: #f8f9fa;
+            background: #f1f2f6;
             border-radius: 4px;
-            padding: 2px 6px;
+            padding: 2px 8px;
             display: inline-block;
             margin-bottom: 2px;
         }
@@ -806,16 +862,17 @@
             bottom: 30px;
             left: 50%;
             transform: translateX(-50%);
-            background: #333;
+            background: #2d3436;
             color: white;
-            padding: 10px 20px;
-            border-radius: 4px;
+            padding: 12px 24px;
+            border-radius: 30px;
             z-index: 3000;
             opacity: 0;
             transition: opacity 0.5s;
             pointer-events: none;
             font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            font-weight: 500;
         }
 
         .toast.show {
@@ -825,6 +882,26 @@
         .visual-marker {
             transition: transform 0.15s ease-out;
         }
+
+        /* Animation Engrenage */
+        #btnToggleGridEdit svg {
+            transition: transform 0.5s ease;
+        }
+
+        #btnToggleGridEdit:hover svg {
+            transform: rotate(90deg);
+        }
+
+        #btnToggleGridEdit.edit-mode-active svg {
+            fill: #e67e22;
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
     </style>
 </head>
 
@@ -832,7 +909,10 @@
 
     <header>
         <div class="header-section">
-            <div class="app-title">📐 Prof Studio</div>
+            <div class="app-title">
+                <span style="font-size:1.5rem;">📐</span> Prof Studio
+            </div>
+
             <div class="toolbar-group">
                 <button class="tool-btn" onclick="app.undo()" title="Annuler (Ctrl+Z)"><svg viewBox="0 0 24 24"
                         class="icon-fill">
@@ -886,7 +966,7 @@
                     title="Fonction f(x)"><span
                         style="font-size:1.1rem; font-family: 'Times New Roman', serif; font-weight:bold; font-style:italic;">f(x)</span></button>
                 <button class="tool-btn" id="btnModeTable" onclick="app.openTableModal()"
-                    title="Tableau de Variation (Nouveau)"><svg viewBox="0 0 24 24" class="icon-fill">
+                    title="Tableau de Variation"><svg viewBox="0 0 24 24" class="icon-fill">
                         <path d="M4 4h16v16H4V4zm2 2v2h12V6H6zm0 4v8h4v-8H6zm6 0v8h6v-8h-6z" />
                     </svg></button>
                 <div class="divider"></div>
@@ -894,29 +974,46 @@
                         viewBox="0 0 24 24" class="icon-stroke">
                         <path d="M12 3v18 M3 12h18 M12 3l-3 3 M12 3l3 3 M21 12l-3-3 M21 12l-3 3" />
                     </svg></button>
-                <button class="tool-btn active" id="btnToggleMagnet" onclick="app.toggleMagnet()" title="Aimant"><svg
-                        viewBox="0 0 24 24" class="icon-fill">
-                        <path d="M6,8c0,4.42,3.58,8,8,8s8-3.58,8-8V4h-4v4c0,2.21-1.79,4-4,4s-4-1.79-4-4V4H6V8z" />
-                        <rect x="6" y="2" width="4" height="3" />
-                        <rect x="18" y="2" width="4" height="3" />
-                    </svg></button>
+                <button class="tool-btn active" id="btnToggleMagnet" onclick="app.toggleMagnet()" title="Aimant">
+                    <svg viewBox="0 0 24 24" class="icon-fill">
+                        <path fill-rule="evenodd" clip-rule="evenodd"
+                            d="M1.25 12C1.25 6.61522 5.61522 2.25 11 2.25H16.5C17.7426 2.25 18.75 3.25736 18.75 4.5V6C18.75 7.24264 17.7426 8.25 16.5 8.25H10.9444C8.87338 8.25 7.19444 9.92893 7.19444 12C7.19444 14.0711 8.87338 15.75 10.9444 15.75H16.5C17.7426 15.75 18.75 16.7574 18.75 18V19.5C18.75 20.7426 17.7426 21.75 16.5 21.75H11C5.61522 21.75 1.25 17.3848 1.25 12ZM11 3.75C6.44365 3.75 2.75 7.44365 2.75 12C2.75 16.5563 6.44365 20.25 11 20.25H13.6944V17.25H10.9444C8.04495 17.25 5.69444 14.8995 5.69444 12C5.69444 9.1005 8.04495 6.75 10.9444 6.75H13.6944V3.75H11ZM15.1944 3.75V6.75H16.5C16.9142 6.75 17.25 6.41421 17.25 6V4.5C17.25 4.08579 16.9142 3.75 16.5 3.75H15.1944ZM15.1944 17.25V20.25H16.5C16.9142 20.25 17.25 19.9142 17.25 19.5V18C17.25 17.5858 16.9142 17.25 16.5 17.25H15.1944Z"
+                            fill="currentColor" />
+                        <path
+                            d="M21.0199 5.42382C21.3381 5.15865 21.811 5.20164 22.0762 5.51985L21.5 5.99999C22.0762 5.51985 22.0759 5.51951 22.0762 5.51985L22.0773 5.52123L22.0786 5.52277L22.0816 5.52638L22.0891 5.53565C22.0948 5.54275 22.1018 5.55168 22.1102 5.56247C22.1269 5.58404 22.1486 5.61304 22.1748 5.64961C22.227 5.72274 22.2966 5.82614 22.3775 5.96099C22.5394 6.23081 22.7463 6.62597 22.95 7.15575C23.3582 8.21712 23.75 9.80842 23.75 12C23.75 14.1916 23.3582 15.7829 22.95 16.8442C22.7463 17.374 22.5394 17.7692 22.3775 18.039C22.2966 18.1738 22.227 18.2772 22.1748 18.3504C22.1486 18.3869 22.1269 18.4159 22.1102 18.4375C22.1018 18.4483 22.0948 18.4572 22.0891 18.4643L22.0816 18.4736L22.0786 18.4772L22.0773 18.4788C22.077 18.4791 22.0762 18.4801 21.5 18L22.0762 18.4801C21.811 18.7983 21.3381 18.8413 21.0199 18.5762C20.7032 18.3123 20.6591 17.8426 20.92 17.5244L20.9235 17.52L20.9339 17.5063C20.9393 17.4991 20.9461 17.4898 20.9542 17.4785C20.9839 17.4368 21.0315 17.3668 21.0913 17.2672C21.2106 17.0683 21.3788 16.751 21.55 16.3058C21.8918 15.4171 22.25 14.0084 22.25 12C22.25 9.99156 21.8918 8.58285 21.55 7.69422C21.3788 7.249 21.2106 6.93167 21.0913 6.73274C21.0315 6.63321 20.9839 6.56317 20.9542 6.52146C20.9393 6.50061 20.9288 6.48683 20.9235 6.47999L20.92 6.47552L21.0199 5.42382Z"
+                            fill="currentColor" />
+                        <path
+                            d="M20.1556 8.63578C19.9545 8.27369 19.4979 8.14324 19.1358 8.3444C18.7768 8.54385 18.6455 8.99442 18.8393 9.355L18.8443 9.36524C18.8512 9.37963 18.8643 9.40835 18.8818 9.45199C18.9167 9.53921 18.9691 9.68652 19.0235 9.8988C19.1322 10.3229 19.25 11.0101 19.25 12C19.25 12.9899 19.1322 13.6772 19.0235 14.1012C18.9691 14.3135 18.9167 14.4608 18.8818 14.548C18.8643 14.5917 18.8512 14.6204 18.8443 14.6348L18.8393 14.645C18.6455 15.0056 18.7768 15.4562 19.1358 15.6556C19.4979 15.8568 19.9545 15.7263 20.1556 15.3642L20.1563 15.3629L20.1571 15.3615L20.1588 15.3585L20.1626 15.3514L20.1723 15.333C20.1795 15.319 20.1884 15.3012 20.1986 15.2797C20.2191 15.2367 20.2451 15.1787 20.2745 15.1051C20.3333 14.958 20.4059 14.749 20.4765 14.4738C20.6178 13.9229 20.75 13.1101 20.75 12C20.75 10.8899 20.6178 10.0772 20.4765 9.52623C20.4059 9.25101 20.3333 9.04207 20.2745 8.89491C20.2451 8.82136 20.2191 8.76336 20.1986 8.72034C20.1884 8.69883 20.1795 8.68107 20.1723 8.667L20.1626 8.64865L20.1588 8.64154L20.1571 8.63849L20.1563 8.63709L20.1556 8.63578Z"
+                            fill="currentColor" />
+                    </svg>
+                </button>
             </div>
         </div>
         <div class="header-section">
-            <button class="tool-btn" onclick="app.openHelpModal()" title="Aide / Tutoriel"
-                style="margin-right:10px; color:#f1c40f;"><svg viewBox="0 0 24 24" class="icon-fill">
+            <button class="tool-btn" onclick="app.openHelpModal()" title="Aide / Tutoriel" style="color:#fdcb6e;"><svg
+                    viewBox="0 0 24 24" class="icon-fill">
                     <path
                         d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
                 </svg></button>
-            <button class="btn-action" onclick="app.saveProject()" style="margin-right:10px;">Sauvegarder</button>
-            <button class="btn-action" onclick="app.triggerLoad()" style="margin-right:10px;">Ouvrir</button>
+            <button class="btn-action" onclick="app.saveProject()">Sauvegarder</button>
+            <button class="btn-action" onclick="app.triggerLoad()">Ouvrir</button>
             <input type="file" id="fileLoader" style="display:none" onchange="app.handleFileLoad(this)">
-            <button class="tool-btn" id="btnToggleGridEdit" onclick="app.toggleGridEditMode()" title="Éditer la Grille"
-                style="margin-right:10px"><svg viewBox="0 0 24 24" class="icon-fill">
+
+            <button class="tool-btn" id="btnToggleGridEdit" onclick="app.toggleGridEditMode()"
+                title="Paramètres Grille">
+                <svg viewBox="0 0 24 24" class="icon-fill">
                     <path
-                        d="M3 17v4h4L17.81 9.94l-3.75-3.75L3 17zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l1.83 1.83 3.75 3.75 1.83-1.83z" />
-                </svg></button>
-            <button class="btn-export" onclick="app.openExportModal()">Exporter</button>
+                        d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.07-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.74,8.87 C2.62,9.08,2.66,9.34,2.86,9.49l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.07,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.44-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.47-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z" />
+                </svg>
+            </button>
+
+            <button class="btn-export" onclick="app.openExportModal()">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="white">
+                    <path
+                        d="M19 12v7H5v-7H3v7c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2v-7h-2zm-6 .67l2.59-2.58L17 11.5l-5 5-5-5 1.41-1.41L11 12.67V3h2v9.67z" />
+                </svg>
+                Exporter
+            </button>
         </div>
     </header>
 
@@ -925,7 +1022,7 @@
             <div class="sidebar-content">
                 <div id="normal-mode-panel">
                     <div id="function-settings-panel"
-                        style="display:none; background:#e8f5e9; padding:10px; border:1px solid #a5d6a7; border-radius:6px; margin-bottom:15px;">
+                        style="display:none; background:#e8f5e9; padding:12px; border:1px solid #a5d6a7; border-radius:8px; margin-bottom:15px;">
                         <label style="color:#2e7d32;">Tracer une Fonction</label>
                         <div class="input-group"><label>f(x) = </label><input type="text" id="funcInput"
                                 placeholder="ex: 0.5*x^2 - 2" style="font-family:monospace; font-size:1rem;"></div>
@@ -985,7 +1082,7 @@
                         </select>
                     </div>
                     <div
-                        style="background:white; border:1px solid #ddd; padding:10px; border-radius:4px; margin-top:10px;">
+                        style="background:#fff; border:1px solid #dfe6e9; padding:12px; border-radius:8px; margin-top:10px;">
                         <div class="control-row">
                             <div class="checkbox-wrapper"><input type="checkbox" id="showTicks" checked
                                     onchange="app.updateRender()"><label for="showTicks">Ticks</label></div>
@@ -994,7 +1091,7 @@
                         </div>
                         <div style="margin-top:8px;">
                             <label>Police</label>
-                            <div style="display:grid; grid-template-columns:2fr 1fr; gap:5px;"><select id="fontFamily"
+                            <div style="display:grid; grid-template-columns:2fr 1fr; gap:8px;"><select id="fontFamily"
                                     onchange="app.updateRender()">
                                     <option value="Arial">Arial</option>
                                     <option value="Times New Roman">Times</option>
@@ -1060,26 +1157,27 @@
             <div class="rs-content" style="flex:1; overflow-y:auto;">
                 <div style="padding:10px;">
                     <strong
-                        style="font-size:0.75rem; color:#999; text-transform:uppercase; border-bottom:1px solid #eee; display:block; margin-bottom:5px;">Tableaux</strong>
+                        style="font-size:0.75rem; color:#b2bec3; text-transform:uppercase; border-bottom:1px solid #f1f2f6; display:block; margin-bottom:8px;">Tableaux</strong>
                     <div id="tablesListContainer"></div>
                     <strong
-                        style="font-size:0.75rem; color:#999; text-transform:uppercase; border-bottom:1px solid #eee; display:block; margin-bottom:5px;">Points</strong>
+                        style="font-size:0.75rem; color:#b2bec3; text-transform:uppercase; border-bottom:1px solid #f1f2f6; display:block; margin-bottom:8px; margin-top:20px;">Points</strong>
                     <div id="pointsListContainer"></div>
                     <strong
-                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Géométrie</strong>
+                        style="font-size:0.75rem; color:#b2bec3; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #f1f2f6; margin-bottom:8px;">Géométrie</strong>
                     <div id="linksListContainer"></div>
                     <strong
-                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Textes</strong>
+                        style="font-size:0.75rem; color:#b2bec3; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #f1f2f6; margin-bottom:8px;">Textes</strong>
                     <div id="textsListContainer"></div>
                     <strong
-                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Fonctions</strong>
+                        style="font-size:0.75rem; color:#b2bec3; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #f1f2f6; margin-bottom:8px;">Fonctions</strong>
                     <div id="funcsListContainer"></div>
                 </div>
             </div>
             <div class="rs-footer">
-                <label style="font-weight:bold; color:#555; font-size:0.8rem;">Bilan / Énoncé</label>
+                <label style="font-weight:bold; color:#636e72; font-size:0.8rem; margin-bottom:8px;">Bilan /
+                    Énoncé</label>
                 <textarea id="summaryText"
-                    style="flex:1; width:100%; resize:none; border:1px solid #ddd; border-radius:4px; padding:5px; font-size:0.8rem; font-family:monospace;"
+                    style="flex:1; width:100%; resize:none; border:1px solid #dfe6e9; border-radius:6px; padding:10px; font-size:0.85rem; font-family:monospace;"
                     readonly></textarea>
             </div>
         </div>
@@ -1087,31 +1185,28 @@
 
     <div id="table-modal" class="modal">
         <div class="modal-content xlarge">
-            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee;">Créer un
-                Tableau de Variation</div>
-            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Cliquez sur les cases pour changer les
+            <div
+                style="font-size:1.2rem; font-weight:800; margin-bottom:20px; border-bottom:1px solid #f1f2f6; padding-bottom:10px; color:#2d3436;">
+                Créer un Tableau de Variation</div>
+            <p style="font-size:0.95rem; color:#636e72; margin-bottom:20px;">Cliquez sur les cases pour changer les
                 signes/flèches. Utilisez le bouton vert pour ajouter des colonnes.</p>
-
-            <div style="margin-bottom:15px;">
+            <div style="margin-bottom:20px;">
                 <div class="checkbox-wrapper">
                     <input type="checkbox" id="showFPrime" checked onchange="app.toggleTableRows()">
-                    <label for="showFPrime" style="font-weight:bold;">Afficher la ligne f'(x)</label>
+                    <label for="showFPrime" style="font-weight:600;">Afficher la ligne f'(x)</label>
                 </div>
             </div>
-
             <div style="display:flex;">
                 <div class="tb-column header-col">
                     <div class="tb-cell tb-header-label">x</div>
                     <div class="tb-cell tb-header-label" id="tbHeaderPrime">f'(x)</div>
                     <div class="tb-cell tb-header-label">f(x)</div>
                 </div>
-                <div id="visualTableContainer">
-                </div>
+                <div id="visualTableContainer"></div>
                 <button class="btn-add-col" onclick="app.addTableColumn()" title="Ajouter une colonne">+</button>
             </div>
-
             <div class="modal-actions">
-                <button class="modal-btn" style="background:#eee; color:#333;"
+                <button class="modal-btn" style="background:#f1f2f6; color:#636e72;"
                     onclick="document.getElementById('table-modal').style.display='none'">Annuler</button>
                 <button class="modal-btn" style="background:var(--success); color:white;"
                     onclick="app.confirmTable()">Valider</button>
@@ -1121,8 +1216,9 @@
 
     <div id="export-modal" class="modal">
         <div class="modal-content">
-            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee;">Exporter
-            </div>
+            <div
+                style="font-size:1.2rem; font-weight:800; margin-bottom:20px; border-bottom:1px solid #f1f2f6; padding-bottom:10px; color:#2d3436;">
+                Exporter</div>
             <div class="input-group">
                 <label>Format</label>
                 <select id="exportFormat">
@@ -1140,7 +1236,7 @@
                 </select>
             </div>
             <div class="modal-actions">
-                <button class="modal-btn" style="background:#eee; color:#333;"
+                <button class="modal-btn" style="background:#f1f2f6; color:#636e72;"
                     onclick="document.getElementById('export-modal').style.display='none'">Annuler</button>
                 <button class="modal-btn" style="background:var(--accent); color:white;"
                     onclick="app.performExport('download')">Télécharger</button>
@@ -1153,21 +1249,17 @@
     <div id="help-modal" class="modal">
         <div class="modal-content large">
             <div
-                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
-                <div style="font-size:1.2rem; font-weight:bold;">Aide & Raccourcis</div>
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #f1f2f6; padding-bottom:10px;">
+                <div style="font-size:1.2rem; font-weight:800;">Aide & Raccourcis</div>
                 <button onclick="document.getElementById('help-modal').style.display='none'"
-                    style="border:none; background:none; cursor:pointer; font-size:1.5rem;">×</button>
+                    style="border:none; background:none; cursor:pointer; font-size:1.5rem; color:#b2bec3;">×</button>
             </div>
-            <p style="font-size:0.9rem; margin-bottom:15px;">Bienvenue dans <strong>Prof Studio</strong>. Utilisez la
-                barre d'outils ou les raccourcis clavier.</p>
+            <p style="font-size:0.95rem; margin-bottom:20px; color:#636e72;">Bienvenue dans <strong>Prof
+                    Studio</strong>. Utilisez la barre d'outils ou les raccourcis clavier pour dessiner.</p>
             <table class="shortcuts-table">
                 <tr>
-                    <td>Ctrl + Z</td>
-                    <td>Annuler</td>
-                </tr>
-                <tr>
-                    <td>Ctrl + Y</td>
-                    <td>Rétablir</td>
+                    <td>Ctrl + Z / Y</td>
+                    <td>Annuler / Rétablir</td>
                 </tr>
                 <tr>
                     <td>M</td>
@@ -1206,7 +1298,6 @@
     </div>
 
     <div id="toast" class="toast">Opération effectuée</div>
-
     <script>
         const app = {
             state: {
@@ -1926,14 +2017,14 @@
             deleteActiveItem: function () { if (!this.state.activeContext) return; this.deleteItem(this.state.activeContext.type, this.state.activeContext.index); this.state.activeContext = null; this.hideCtxMenu(); },
             getAvailableLabel: function () { const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; let i = 0; while (true) { const charIndex = i % 26; const cycle = Math.floor(i / 26); const suffix = "'".repeat(cycle); const candidate = alphabet[charIndex] + suffix; if (!this.state.points.some(p => p.label === candidate)) return candidate; i++; } },
             getMousePos: function (e) { const rect = this.ui.wrapper.getBoundingClientRect(); return { x: (e.clientX - rect.left) / this.state.viewZoom, y: (e.clientY - rect.top) / this.state.viewZoom }; },
-            addPoint: function (e) { this.saveState(); const pos = this.getMousePos(e); let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; } this.state.points.push({ u: lu, v: lv, label: this.getAvailableLabel(), color: "#e74c3c", showCoords: false }); this.updateRender(); return this.state.points.length - 1; },
+            addPoint: function (e) { this.saveState(); const pos = this.getMousePos(e); let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 10) / 10; lv = Math.round(lv * 10) / 10; } this.state.points.push({ u: lu, v: lv, label: this.getAvailableLabel(), color: "#e74c3c", showCoords: false }); this.updateRender(); return this.state.points.length - 1; },
 
             addText: function (e) { const pos = this.getMousePos(e); let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; this.state.tempTextPos = { u: lu, v: lv }; this.ui.floatingInput.style.display = 'block'; this.ui.floatingInput.style.left = e.clientX + 'px'; this.ui.floatingInput.style.top = e.clientY + 'px'; this.ui.floatingInput.value = ''; this.ui.floatingInput.focus(); },
             confirmText: function () { const content = this.ui.floatingInput.value.trim(); if (content && this.state.tempTextPos) { this.saveState(); if (!this.state.texts) this.state.texts = []; this.state.texts.push({ u: this.state.tempTextPos.u, v: this.state.tempTextPos.v, content: content, color: "#333" }); this.updateRender(); this.setMode('move'); } this.cancelText(); },
             cancelText: function () { this.ui.floatingInput.style.display = 'none'; this.ui.floatingInput.value = ''; this.state.tempTextPos = null; },
             recenterAxes: function () { this.saveState(); this.state.axisX = this.state.width / 2; this.state.axisY = this.state.height / 2; this.updateRender(); },
             getSmoothPath: function (ptIndices) { if (ptIndices.length < 2) return ""; const coords = ptIndices.map(i => { const p = this.state.points[i]; return { x: this.state.axisX + p.u * this.state.baseUnit, y: this.state.axisY - p.v * this.state.baseUnit }; }); if (coords.length === 2) return `M ${coords[0].x} ${coords[0].y} L ${coords[1].x} ${coords[1].y}`; let d = `M ${coords[0].x} ${coords[0].y}`; for (let i = 0; i < coords.length - 1; i++) { const p0 = coords[i === 0 ? 0 : i - 1]; const p1 = coords[i]; const p2 = coords[i + 1]; const p3 = coords[i + 2] || p2; const cp1x = p1.x + (p2.x - p0.x) / 6; const cp1y = p1.y + (p2.y - p0.y) / 6; const cp2x = p2.x - (p3.x - p1.x) / 6; const cp2y = p2.y - (p3.y - p1.y) / 6; d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`; } return d; },
-            renderGhost: function (pos) { if (this.state.interactionMode !== 'point') return ""; let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; } const px = this.state.axisX + lu * this.state.baseUnit; const py = this.state.axisY - lv * this.state.baseUnit; const col = "#e74c3c"; let svg = `<g style="pointer-events:none;">`; svg += `<line x1="${px}" y1="${py}" x2="${px}" y2="${this.state.axisY}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; svg += `<line x1="${px}" y1="${py}" x2="${this.state.axisX}" y2="${py}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; const s = 5; svg += `<path d="M ${px - s} ${py - s} L ${px + s} ${py + s} M ${px - s} ${py + s} L ${px + s} ${py - s}" stroke="${col}" stroke-width="2"/>`; svg += `<text x="${px + 8}" y="${py - 8}" font-family="Arial" font-size="12" fill="${col}" font-weight="bold">(${lu}; ${lv})</text></g>`; return svg; },
+            renderGhost: function (pos) { if (this.state.interactionMode !== 'point') return ""; let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 10) / 10; lv = Math.round(lv * 10) / 10; } const px = this.state.axisX + lu * this.state.baseUnit; const py = this.state.axisY - lv * this.state.baseUnit; const col = "#e74c3c"; let svg = `<g style="pointer-events:none;">`; svg += `<line x1="${px}" y1="${py}" x2="${px}" y2="${this.state.axisY}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; svg += `<line x1="${px}" y1="${py}" x2="${this.state.axisX}" y2="${py}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; const s = 5; svg += `<path d="M ${px - s} ${py - s} L ${px + s} ${py + s} M ${px - s} ${py + s} L ${px + s} ${py - s}" stroke="${col}" stroke-width="2"/>`; svg += `<text x="${px + 8}" y="${py - 8}" font-family="Arial" font-size="12" fill="${col}" font-weight="bold">(${lu}; ${lv})</text></g>`; return svg; },
             setMode: function (mode) { if (this.state.activeCurve.length > 0) this.finishCurve(); this.state.interactionMode = mode; this.state.tempLinkStart = null; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); const instructions = { 'move': "Déplacez les axes ou redimensionnez.", 'point': "Cliquez pour placer un point.", 'link': "Clic point départ -> Clic point arrivée.", 'curve': "Clics successifs. 'Entrée' pour finir.", 'circle': "Clic centre -> Clic point du bord.", 'text': "Cliquez pour écrire.", 'function': "Remplissez f(x) à gauche." }; if (instructions[mode]) this.showToast(instructions[mode]); const mapBtn = { 'move': 'btnModeMove', 'point': 'btnModePoint', 'link': 'btnModeLink', 'curve': 'btnModeCurve', 'circle': 'btnModeCircle', 'text': 'btnModeText', 'function': 'btnModeFunction' }; if (mapBtn[mode]) document.getElementById(mapBtn[mode]).classList.add('active'); this.ui.wrapper.style.cursor = (mode === 'move') ? 'default' : (mode === 'point' ? 'crosshair' : 'pointer'); document.getElementById('tool-settings-panel').style.display = (mode === 'link' || mode === 'curve' || mode === 'circle') ? 'block' : 'none'; document.getElementById('function-settings-panel').style.display = (mode === 'function') ? 'block' : 'none'; this.updateRender(); },
             zoomView: function (delta) { this.state.viewZoom += delta; if (this.state.viewZoom < 0.2) this.state.viewZoom = 0.2; if (this.state.viewZoom > 5) this.state.viewZoom = 5; this.applyZoomCSS(); },
             applyZoomCSS: function () { this.ui.wrapper.style.transform = `scale(${this.state.viewZoom})`; },
