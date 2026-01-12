@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prof Studio - Version Complète</title>
+    <title>Prof Studio - Version Finale (Axes Fléchés & Visibilité)</title>
     <style>
         :root {
             --header-bg: #2c3e50;
@@ -17,6 +17,7 @@
             --danger: #e74c3c;
             --success: #27ae60;
             --warning: #f39c12;
+            --inactive: #95a5a6;
         }
 
         * {
@@ -35,7 +36,7 @@
             background: #666;
         }
 
-        /* --- HEADER --- */
+        /* HEADER */
         header {
             height: 50px;
             background-color: var(--header-bg);
@@ -116,10 +117,17 @@
             fill: currentColor;
             stroke: currentColor;
         }
-        
-        /* Specific stroke handling for icons */
-        .icon-stroke { fill: none !important; stroke: currentColor; stroke-width: 2; }
-        .icon-fill { fill: currentColor; stroke: none; }
+
+        .icon-stroke {
+            fill: none !important;
+            stroke: currentColor;
+            stroke-width: 2;
+        }
+
+        .icon-fill {
+            fill: currentColor;
+            stroke: none;
+        }
 
         .header-select {
             background: rgba(255, 255, 255, 0.15);
@@ -156,6 +164,21 @@
             background-color: #219150;
         }
 
+        .btn-action {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        .btn-action:hover {
+            background-color: var(--accent-hover);
+        }
+
         .btn-full {
             width: 100%;
             padding: 8px;
@@ -188,7 +211,7 @@
             background: #219150;
         }
 
-        /* --- LAYOUT --- */
+        /* LAYOUT */
         #main-container {
             display: flex;
             flex: 1;
@@ -379,6 +402,25 @@
             background: #f9f9f9;
         }
 
+        .obj-item.hidden-item {
+            opacity: 0.5;
+            background: #f0f0f0;
+        }
+
+        /* Style pour éléments cachés */
+
+        .obj-info {
+            flex: 1;
+            overflow: hidden;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+        }
+
+        .obj-actions {
+            display: flex;
+            gap: 5px;
+        }
+
         .obj-marker {
             width: 8px;
             height: 8px;
@@ -387,17 +429,26 @@
             margin-right: 8px;
         }
 
-        .obj-del {
+        .obj-btn {
             background: none;
             border: none;
-            color: #ccc;
             cursor: pointer;
-            font-size: 1.1rem;
-            padding: 0 5px;
+            font-size: 1rem;
+            padding: 0 4px;
+            color: #aaa;
+            transition: color 0.2s;
+        }
+
+        .obj-btn:hover {
+            color: #333;
         }
 
         .obj-del:hover {
             color: var(--danger);
+        }
+
+        .obj-vis:hover {
+            color: var(--accent);
         }
 
         .empty-msg {
@@ -429,12 +480,8 @@
             transition: width 0.3s, height 0.3s;
         }
 
-        #tool-settings-panel {
-            background: #e3f2fd;
-            border: 1px solid #90caf9;
-            padding: 10px;
-            border-radius: 6px;
-            margin-bottom: 15px;
+        #tool-settings-panel,
+        #function-settings-panel {
             display: none;
         }
 
@@ -522,10 +569,24 @@
             cursor: pointer;
         }
 
+        #context-menu button.edit {
+            width: 100%;
+            padding: 6px;
+            color: white;
+            background: var(--accent);
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-bottom: 5px;
+        }
+
         /* MODALS */
         .modal {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.5);
             z-index: 2000;
             display: none;
@@ -542,9 +603,13 @@
             max-height: 90vh;
             overflow-y: auto;
         }
-        
+
         .modal-content.large {
             width: 500px;
+        }
+
+        .modal-content.xlarge {
+            width: 800px;
         }
 
         .modal-actions {
@@ -561,7 +626,157 @@
             font-weight: bold;
             cursor: pointer;
         }
-        
+
+        /* --- VISUAL TABLE BUILDER STYLES --- */
+        #visualTableContainer {
+            display: flex;
+            align-items: flex-start;
+            gap: 0;
+            overflow-x: auto;
+            padding: 10px;
+            background: #f0f0f0;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+        }
+
+        .tb-column {
+            display: flex;
+            flex-direction: column;
+            width: 80px;
+            flex-shrink: 0;
+            border-right: 1px solid #eee;
+            position: relative;
+        }
+
+        .tb-column:last-child {
+            border-right: none;
+        }
+
+        .tb-column.header-col {
+            width: 100px;
+            background: #f8f9fa;
+            border-right: 2px solid #ddd;
+        }
+
+        .tb-column.interval {
+            width: 50px;
+            background: #fdfdfd;
+        }
+
+        .tb-cell {
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-bottom: 1px solid #eee;
+            font-size: 0.95rem;
+            position: relative;
+        }
+
+        .tb-column .tb-cell:last-child {
+            border-bottom: none;
+        }
+
+        .tb-header-label {
+            font-weight: bold;
+            color: #555;
+        }
+
+        .tb-input {
+            width: 100%;
+            height: 100%;
+            border: none;
+            text-align: center;
+            background: transparent;
+            font-family: monospace;
+            font-size: 1.1rem;
+            outline: none;
+            color: #2c3e50;
+            font-weight: bold;
+        }
+
+        .tb-input:focus {
+            background: #e8f5e9;
+        }
+
+        .tb-btn {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.2rem;
+            color: #3498db;
+        }
+
+        .tb-btn:hover {
+            background: #e3f2fd;
+        }
+
+        .btn-add-col {
+            width: 50px;
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 0 6px 6px 0;
+            cursor: pointer;
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .btn-add-col:hover {
+            background: #219150;
+        }
+
+        .btn-del-col {
+            position: absolute;
+            top: -10px;
+            right: 50%;
+            transform: translateX(50%);
+            background: var(--danger);
+            color: white;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 22px;
+            height: 22px;
+            font-size: 14px;
+            cursor: pointer;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+        }
+
+        .tb-column:hover .btn-del-col {
+            display: flex;
+        }
+
+        .tb-column.header-col:hover .btn-del-col {
+            display: none;
+        }
+
+        /* INPUT FLOTTANT */
+        #floatingInput {
+            position: absolute;
+            display: none;
+            z-index: 5000;
+            background: rgba(255, 255, 255, 0.95);
+            border: 1px solid var(--accent);
+            padding: 4px 8px;
+            font-family: Arial, sans-serif;
+            font-size: 14px;
+            border-radius: 4px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            min-width: 150px;
+            outline: none;
+            transform: translate(-50%, -50%);
+        }
+
         /* HELP TABLE */
         .shortcuts-table {
             width: 100%;
@@ -569,10 +784,12 @@
             font-size: 0.85rem;
             margin-top: 10px;
         }
+
         .shortcuts-table td {
             padding: 5px;
             border-bottom: 1px solid #eee;
         }
+
         .shortcuts-table td:first-child {
             font-family: monospace;
             font-weight: bold;
@@ -598,7 +815,7 @@
             transition: opacity 0.5s;
             pointer-events: none;
             font-size: 0.9rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
         }
 
         .toast.show {
@@ -608,23 +825,6 @@
         .visual-marker {
             transition: transform 0.15s ease-out;
         }
-
-        /* --- NOUVEAU : STYLE POUR L'INPUT FLOTTANT --- */
-        #floatingInput {
-            position: absolute;
-            display: none;
-            z-index: 5000;
-            background: rgba(255, 255, 255, 0.95);
-            border: 1px solid var(--accent);
-            padding: 4px 8px;
-            font-family: Arial, sans-serif;
-            font-size: 14px;
-            border-radius: 4px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
-            min-width: 150px;
-            outline: none;
-            transform: translate(-50%, -50%); /* Centrer sur le clic */
-        }
     </style>
 </head>
 
@@ -633,86 +833,102 @@
     <header>
         <div class="header-section">
             <div class="app-title">📐 Prof Studio</div>
-
             <div class="toolbar-group">
-                <button class="tool-btn" onclick="app.undo()" title="Annuler (Ctrl+Z)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z"/></svg>
-                </button>
-                <button class="tool-btn" onclick="app.redo()" title="Rétablir (Ctrl+Y)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z"/></svg>
-                </button>
-                
+                <button class="tool-btn" onclick="app.undo()" title="Annuler (Ctrl+Z)"><svg viewBox="0 0 24 24"
+                        class="icon-fill">
+                        <path
+                            d="M12.5 8c-2.65 0-5.05.99-6.9 2.6L2 7v9h9l-3.62-3.62c1.39-1.16 3.16-1.88 5.12-1.88 3.54 0 6.55 2.31 7.6 5.5l2.37-.78C21.08 11.03 17.15 8 12.5 8z" />
+                    </svg></button>
+                <button class="tool-btn" onclick="app.redo()" title="Rétablir (Ctrl+Y)"><svg viewBox="0 0 24 24"
+                        class="icon-fill">
+                        <path
+                            d="M18.4 10.6C16.55 9 14.15 8 11.5 8c-4.65 0-8.58 3.03-9.96 7.22L3.9 16c1.05-3.19 4.05-5.5 7.6-5.5 1.95 0 3.73.72 5.12 1.88L13 16h9V7l-3.6 3.6z" />
+                    </svg></button>
                 <div class="divider"></div>
-
                 <select class="header-select" id="headerGridPreset" onchange="app.loadGridPreset(this.value)">
                     <option value="millimeter" selected>Papier Millimétré</option>
                     <option value="graduated">Repère Gradué</option>
                     <option value="seyes">Seyès</option>
                     <option value="simple">Carreaux Simples</option>
                 </select>
-
                 <div class="divider"></div>
-
-                <button class="tool-btn active" id="btnModeMove" onclick="app.setMode('move')" title="Déplacer (M)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" /></svg>
-                </button>
-                <button class="tool-btn" id="btnModePoint" onclick="app.setMode('point')" title="Point (P)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" /></svg>
-                </button>
-                <button class="tool-btn" id="btnModeLink" onclick="app.setMode('link')" title="Ligne/Segment (L)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
-                </button>
-                <button class="tool-btn" id="btnModeCurve" onclick="app.setMode('curve')" title="Courbe Spline (S)">
-                    <svg viewBox="0 0 24 24" class="icon-stroke"><circle cx="4" cy="12" r="2" class="icon-fill"/><circle cx="20" cy="12" r="2" class="icon-fill"/><path d="M4 12 C 8 4, 16 20, 20 12" /></svg>
-                </button>
-                <button class="tool-btn" id="btnModeCircle" onclick="app.setMode('circle')" title="Cercle (C)">
-                    <svg viewBox="0 0 24 24" class="icon-stroke"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="1.5" class="icon-fill"/></svg>
-                </button>
-                <button class="tool-btn" id="btnModeText" onclick="app.setMode('text')" title="Texte Libre (T)">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M5 4v3h5.5v12h3V7H19V4z"/></svg>
-                </button>
-                <button class="tool-btn" id="btnModeFunction" onclick="app.setMode('function')" title="Fonction f(x)">
-                    <span style="font-size:1.1rem; font-family: 'Times New Roman', serif; font-weight:bold; font-style:italic;">f(x)</span>
-                </button>
-
+                <button class="tool-btn active" id="btnModeMove" onclick="app.setMode('move')" title="Déplacer (M)"><svg
+                        viewBox="0 0 24 24" class="icon-fill">
+                        <path
+                            d="M10 9h4V6h3l-5-5-5 5h3v3zm-1 1H6V7l-5 5 5 5v-3h3v-4zm14 2l-5-5v3h-3v4h3v3l5-5zm-9 3h-4v3H7l5 5 5-5h-3v-3z" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModePoint" onclick="app.setMode('point')" title="Point (P)"><svg
+                        viewBox="0 0 24 24" class="icon-fill">
+                        <path
+                            d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModeLink" onclick="app.setMode('link')" title="Ligne/Segment (L)"><svg
+                        viewBox="0 0 24 24" class="icon-fill">
+                        <path
+                            d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModeCurve" onclick="app.setMode('curve')" title="Courbe Spline (S)"><svg
+                        viewBox="0 0 24 24" class="icon-stroke">
+                        <circle cx="4" cy="12" r="2" class="icon-fill" />
+                        <circle cx="20" cy="12" r="2" class="icon-fill" />
+                        <path d="M4 12 C 8 4, 16 20, 20 12" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModeCircle" onclick="app.setMode('circle')" title="Cercle (C)"><svg
+                        viewBox="0 0 24 24" class="icon-stroke">
+                        <circle cx="12" cy="12" r="9" />
+                        <circle cx="12" cy="12" r="1.5" class="icon-fill" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModeText" onclick="app.setMode('text')" title="Texte Libre (T)"><svg
+                        viewBox="0 0 24 24" class="icon-fill">
+                        <path d="M5 4v3h5.5v12h3V7H19V4z" />
+                    </svg></button>
+                <button class="tool-btn" id="btnModeFunction" onclick="app.setMode('function')"
+                    title="Fonction f(x)"><span
+                        style="font-size:1.1rem; font-family: 'Times New Roman', serif; font-weight:bold; font-style:italic;">f(x)</span></button>
+                <button class="tool-btn" id="btnModeTable" onclick="app.openTableModal()"
+                    title="Tableau de Variation (Nouveau)"><svg viewBox="0 0 24 24" class="icon-fill">
+                        <path d="M4 4h16v16H4V4zm2 2v2h12V6H6zm0 4v8h4v-8H6zm6 0v8h6v-8h-6z" />
+                    </svg></button>
                 <div class="divider"></div>
-
-                <button class="tool-btn active" id="btnToggleAxes" onclick="app.toggleAxes()" title="Axes">
-                    <svg viewBox="0 0 24 24" class="icon-stroke"><path d="M12 3v18 M3 12h18 M12 3l-3 3 M12 3l3 3 M21 12l-3-3 M21 12l-3 3" /></svg>
-                </button>
-                <button class="tool-btn active" id="btnToggleMagnet" onclick="app.toggleMagnet()" title="Aimant">
-                    <svg viewBox="0 0 24 24" class="icon-fill"><path d="M6,8c0,4.42,3.58,8,8,8s8-3.58,8-8V4h-4v4c0,2.21-1.79,4-4,4s-4-1.79-4-4V4H6V8z" /><rect x="6" y="2" width="4" height="3" /><rect x="18" y="2" width="4" height="3" /></svg>
-                </button>
+                <button class="tool-btn active" id="btnToggleAxes" onclick="app.toggleAxes()" title="Axes"><svg
+                        viewBox="0 0 24 24" class="icon-stroke">
+                        <path d="M12 3v18 M3 12h18 M12 3l-3 3 M12 3l3 3 M21 12l-3-3 M21 12l-3 3" />
+                    </svg></button>
+                <button class="tool-btn active" id="btnToggleMagnet" onclick="app.toggleMagnet()" title="Aimant"><svg
+                        viewBox="0 0 24 24" class="icon-fill">
+                        <path d="M6,8c0,4.42,3.58,8,8,8s8-3.58,8-8V4h-4v4c0,2.21-1.79,4-4,4s-4-1.79-4-4V4H6V8z" />
+                        <rect x="6" y="2" width="4" height="3" />
+                        <rect x="18" y="2" width="4" height="3" />
+                    </svg></button>
             </div>
         </div>
-
         <div class="header-section">
-            <button class="tool-btn" onclick="app.openHelpModal()" title="Aide / Tutoriel" style="margin-right:10px; color:#f1c40f;">
-                <svg viewBox="0 0 24 24" class="icon-fill"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
-            </button>
-            <button class="tool-btn" id="btnToggleGridEdit" onclick="app.toggleGridEditMode()" title="Éditer la Grille" style="margin-right:10px">
-                <svg viewBox="0 0 24 24" class="icon-fill"><path d="M3 17v4h4L17.81 9.94l-3.75-3.75L3 17zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l1.83 1.83 3.75 3.75 1.83-1.83z" /></svg>
-            </button>
-            <button class="btn-export" onclick="app.openExportModal()">
-                Exporter
-            </button>
+            <button class="tool-btn" onclick="app.openHelpModal()" title="Aide / Tutoriel"
+                style="margin-right:10px; color:#f1c40f;"><svg viewBox="0 0 24 24" class="icon-fill">
+                    <path
+                        d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z" />
+                </svg></button>
+            <button class="btn-action" onclick="app.saveProject()" style="margin-right:10px;">Sauvegarder</button>
+            <button class="btn-action" onclick="app.triggerLoad()" style="margin-right:10px;">Ouvrir</button>
+            <input type="file" id="fileLoader" style="display:none" onchange="app.handleFileLoad(this)">
+            <button class="tool-btn" id="btnToggleGridEdit" onclick="app.toggleGridEditMode()" title="Éditer la Grille"
+                style="margin-right:10px"><svg viewBox="0 0 24 24" class="icon-fill">
+                    <path
+                        d="M3 17v4h4L17.81 9.94l-3.75-3.75L3 17zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l1.83 1.83 3.75 3.75 1.83-1.83z" />
+                </svg></button>
+            <button class="btn-export" onclick="app.openExportModal()">Exporter</button>
         </div>
     </header>
 
     <div id="main-container">
         <div id="left-sidebar" class="sidebar">
             <div class="sidebar-content">
-
                 <div id="normal-mode-panel">
-
                     <div id="function-settings-panel"
                         style="display:none; background:#e8f5e9; padding:10px; border:1px solid #a5d6a7; border-radius:6px; margin-bottom:15px;">
                         <label style="color:#2e7d32;">Tracer une Fonction</label>
-                        <div class="input-group">
-                            <label>f(x) = </label>
-                            <input type="text" id="funcInput" placeholder="ex: 0.5*x^2 - 2"
-                                style="font-family:monospace; font-size:1rem;">
-                        </div>
+                        <div class="input-group"><label>f(x) = </label><input type="text" id="funcInput"
+                                placeholder="ex: 0.5*x^2 - 2" style="font-family:monospace; font-size:1rem;"></div>
                         <div class="control-row">
                             <div class="input-group"><label>Couleur</label><input type="color" id="funcColor"
                                     value="#e74c3c"></div>
@@ -721,7 +937,6 @@
                         </div>
                         <button class="btn-full btn-accent" onclick="app.addFunction()">Tracer</button>
                     </div>
-
                     <div id="tool-settings-panel">
                         <div class="input-group">
                             <label style="color:#1565c0;">Style de Trait / Courbe</label>
@@ -736,12 +951,10 @@
                         <div class="control-row">
                             <div class="input-group"><label>Épaisseur</label><input type="number" id="linkWidth"
                                     value="2"></div>
-                            <div class="checkbox-wrapper" style="align-items:flex-end; padding-bottom:5px;">
-                                <input type="checkbox" id="linkDashed"><label for="linkDashed">Pointillés</label>
-                            </div>
+                            <div class="checkbox-wrapper" style="align-items:flex-end; padding-bottom:5px;"><input
+                                    type="checkbox" id="linkDashed"><label for="linkDashed">Pointillés</label></div>
                         </div>
                     </div>
-
                     <h3>Mise en page</h3>
                     <div class="control-row">
                         <div class="input-group"><label>Format</label><select id="sizePreset"
@@ -759,7 +972,6 @@
                         <div class="input-group"><label>L (px)</label><input type="number" id="totalWidth"></div>
                         <div class="input-group"><label>H (px)</label><input type="number" id="totalHeight"></div>
                     </div>
-
                     <h3>Axes & Grille</h3>
                     <div class="input-group">
                         <label>Thème Couleur</label>
@@ -772,7 +984,6 @@
                             <option value="contrast">Contraste Fort</option>
                         </select>
                     </div>
-
                     <div
                         style="background:white; border:1px solid #ddd; padding:10px; border-radius:4px; margin-top:10px;">
                         <div class="control-row">
@@ -783,13 +994,12 @@
                         </div>
                         <div style="margin-top:8px;">
                             <label>Police</label>
-                            <div style="display:grid; grid-template-columns:2fr 1fr; gap:5px;">
-                                <select id="fontFamily" onchange="app.updateRender()">
+                            <div style="display:grid; grid-template-columns:2fr 1fr; gap:5px;"><select id="fontFamily"
+                                    onchange="app.updateRender()">
                                     <option value="Arial">Arial</option>
                                     <option value="Times New Roman">Times</option>
                                     <option value="Comic Sans MS">Comic</option>
-                                </select>
-                                <input type="number" id="fontSize" value="12" oninput="app.updateRender()">
+                                </select><input type="number" id="fontSize" value="12" oninput="app.updateRender()">
                             </div>
                         </div>
                         <div style="margin-top:8px;">
@@ -806,17 +1016,13 @@
                         </div>
                     </div>
                 </div>
-
                 <div id="grid-edit-panel" style="display:none;">
                     <h3 class="edit-title">Édition des Couches</h3>
                     <div id="layers-container-edit"></div>
                     <button class="btn-full btn-accent" onclick="app.addLayer()">+ Ajouter une couche</button>
-
                     <h3 class="edit-title" style="margin-top:30px;">Sauvegarder Preset</h3>
-                    <div class="input-group">
-                        <label>Nom du nouveau papier</label>
-                        <input type="text" id="newPresetName" placeholder="Mon Papier Perso">
-                    </div>
+                    <div class="input-group"><label>Nom du nouveau papier</label><input type="text" id="newPresetName"
+                            placeholder="Mon Papier Perso"></div>
                     <button class="btn-full btn-save" onclick="app.saveCustomPreset()">Enregistrer dans la
                         liste</button>
                 </div>
@@ -830,9 +1036,7 @@
                 <div class="resize-handle resize-se" data-dir="se"></div>
             </div>
             <div id="dim-overlay">0 x 0 mm</div>
-            
             <input type="text" id="floatingInput" placeholder="Entrez le texte..." />
-
             <div id="context-menu">
                 <h4 id="ctxTitle">Modifier</h4>
                 <div class="ctx-row" id="ctxNameRow">
@@ -845,6 +1049,8 @@
                     <div class="checkbox-wrapper"><input type="checkbox" id="ctxShowCoords"><label
                             for="ctxShowCoords">Coordonnées</label></div>
                 </div>
+                <button class="edit" id="ctxEditBtn" style="display:none;" onclick="app.editActiveTable()">Modifier le
+                    tableau</button>
                 <button class="danger" id="ctxDeleteBtn">Supprimer</button>
             </div>
         </div>
@@ -853,16 +1059,20 @@
             <div class="rs-header">Liste des Objets</div>
             <div class="rs-content" style="flex:1; overflow-y:auto;">
                 <div style="padding:10px;">
-                    <strong style="font-size:0.75rem; color:#999; text-transform:uppercase; border-bottom:1px solid #eee; display:block; margin-bottom:5px;">Points</strong>
+                    <strong
+                        style="font-size:0.75rem; color:#999; text-transform:uppercase; border-bottom:1px solid #eee; display:block; margin-bottom:5px;">Tableaux</strong>
+                    <div id="tablesListContainer"></div>
+                    <strong
+                        style="font-size:0.75rem; color:#999; text-transform:uppercase; border-bottom:1px solid #eee; display:block; margin-bottom:5px;">Points</strong>
                     <div id="pointsListContainer"></div>
-
-                    <strong style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Géométrie</strong>
+                    <strong
+                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Géométrie</strong>
                     <div id="linksListContainer"></div>
-
-                    <strong style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Textes</strong>
+                    <strong
+                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Textes</strong>
                     <div id="textsListContainer"></div>
-
-                    <strong style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Fonctions</strong>
+                    <strong
+                        style="font-size:0.75rem; color:#999; text-transform:uppercase; display:block; margin-top:20px; border-bottom:1px solid #eee; margin-bottom:5px;">Fonctions</strong>
                     <div id="funcsListContainer"></div>
                 </div>
             </div>
@@ -871,6 +1081,40 @@
                 <textarea id="summaryText"
                     style="flex:1; width:100%; resize:none; border:1px solid #ddd; border-radius:4px; padding:5px; font-size:0.8rem; font-family:monospace;"
                     readonly></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="table-modal" class="modal">
+        <div class="modal-content xlarge">
+            <div style="font-size:1.1rem; font-weight:bold; margin-bottom:15px; border-bottom:1px solid #eee;">Créer un
+                Tableau de Variation</div>
+            <p style="font-size:0.9rem; color:#666; margin-bottom:15px;">Cliquez sur les cases pour changer les
+                signes/flèches. Utilisez le bouton vert pour ajouter des colonnes.</p>
+
+            <div style="margin-bottom:15px;">
+                <div class="checkbox-wrapper">
+                    <input type="checkbox" id="showFPrime" checked onchange="app.toggleTableRows()">
+                    <label for="showFPrime" style="font-weight:bold;">Afficher la ligne f'(x)</label>
+                </div>
+            </div>
+
+            <div style="display:flex;">
+                <div class="tb-column header-col">
+                    <div class="tb-cell tb-header-label">x</div>
+                    <div class="tb-cell tb-header-label" id="tbHeaderPrime">f'(x)</div>
+                    <div class="tb-cell tb-header-label">f(x)</div>
+                </div>
+                <div id="visualTableContainer">
+                </div>
+                <button class="btn-add-col" onclick="app.addTableColumn()" title="Ajouter une colonne">+</button>
+            </div>
+
+            <div class="modal-actions">
+                <button class="modal-btn" style="background:#eee; color:#333;"
+                    onclick="document.getElementById('table-modal').style.display='none'">Annuler</button>
+                <button class="modal-btn" style="background:var(--success); color:white;"
+                    onclick="app.confirmTable()">Valider</button>
             </div>
         </div>
     </div>
@@ -908,29 +1152,56 @@
 
     <div id="help-modal" class="modal">
         <div class="modal-content large">
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
+            <div
+                style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; border-bottom:1px solid #eee; padding-bottom:10px;">
                 <div style="font-size:1.2rem; font-weight:bold;">Aide & Raccourcis</div>
-                <button onclick="document.getElementById('help-modal').style.display='none'" style="border:none; background:none; cursor:pointer; font-size:1.5rem;">×</button>
+                <button onclick="document.getElementById('help-modal').style.display='none'"
+                    style="border:none; background:none; cursor:pointer; font-size:1.5rem;">×</button>
             </div>
-            
-            <p style="font-size:0.9rem; margin-bottom:15px;">Bienvenue dans <strong>Prof Studio</strong>. Utilisez la barre d'outils ou les raccourcis clavier pour créer rapidement des schémas mathématiques.</p>
-            
+            <p style="font-size:0.9rem; margin-bottom:15px;">Bienvenue dans <strong>Prof Studio</strong>. Utilisez la
+                barre d'outils ou les raccourcis clavier.</p>
             <table class="shortcuts-table">
-                <tr><td>Ctrl + Z</td><td>Annuler</td></tr>
-                <tr><td>Ctrl + Y</td><td>Rétablir</td></tr>
-                <tr><td>M</td><td>Outil Déplacement</td></tr>
-                <tr><td>P</td><td>Placer un Point</td></tr>
-                <tr><td>L</td><td>Ligne / Segment (Clic Début -> Clic Fin)</td></tr>
-                <tr><td>S</td><td>Courbe Spline</td></tr>
-                <tr><td>C</td><td>Cercle (Clic Centre -> Clic Bord)</td></tr>
-                <tr><td>T</td><td>Texte Libre</td></tr>
-                <tr><td>Clic Droit</td><td>Modifier un objet (Couleur, Nom)</td></tr>
-                <tr><td>Suppr</td><td>Supprimer l'objet sélectionné (Clic droit)</td></tr>
+                <tr>
+                    <td>Ctrl + Z</td>
+                    <td>Annuler</td>
+                </tr>
+                <tr>
+                    <td>Ctrl + Y</td>
+                    <td>Rétablir</td>
+                </tr>
+                <tr>
+                    <td>M</td>
+                    <td>Outil Déplacement</td>
+                </tr>
+                <tr>
+                    <td>P</td>
+                    <td>Placer un Point</td>
+                </tr>
+                <tr>
+                    <td>L</td>
+                    <td>Ligne / Segment</td>
+                </tr>
+                <tr>
+                    <td>S</td>
+                    <td>Courbe Spline</td>
+                </tr>
+                <tr>
+                    <td>C</td>
+                    <td>Cercle</td>
+                </tr>
+                <tr>
+                    <td>T</td>
+                    <td>Texte Libre</td>
+                </tr>
+                <tr>
+                    <td>Clic Droit</td>
+                    <td>Modifier un objet (Tableau inclus)</td>
+                </tr>
+                <tr>
+                    <td>Suppr</td>
+                    <td>Supprimer sélection</td>
+                </tr>
             </table>
-
-            <div style="margin-top:20px; font-size:0.85rem; color:#666; background:#f8f9fa; padding:10px; border-radius:4px;">
-                <strong>Astuce :</strong> Le "Presse Papier" permet de coller l'image directement dans Word ou LibreOffice sans enregistrer de fichier.
-            </div>
         </div>
     </div>
 
@@ -942,13 +1213,14 @@
                 width: 0, height: 0, baseUnit: 40, margin: 20,
                 axisX: 0, axisY: 0,
                 layers: [], points: [], links: [], curves: [], functions: [], circles: [], texts: [],
+                tables: [], tableDraft: [],
                 activeCurve: [],
                 history: [], redoStack: [],
                 interactionMode: 'move', tempLinkStart: null,
                 showAxes: true, showLabels: false, showTicks: true,
                 labelStyle: 'badge', labelDistance: 20, labelFont: "Arial", labelFontSize: 12,
                 magnetMode: true, activeContext: null, viewZoom: 1.0, isGridEditMode: false,
-                tempTextPos: null // Pour stocker la position du texte en cours d'édition
+                tempTextPos: null, isEditingTable: false, editingTableIndex: -1
             },
 
             lineStyles: { solid: "none", dash: "8, 6", shortdash: "4, 4", dot: "1, 5" },
@@ -979,9 +1251,11 @@
                 linksList: document.getElementById('linksListContainer'),
                 funcsList: document.getElementById('funcsListContainer'),
                 textsList: document.getElementById('textsListContainer'),
+                tablesList: document.getElementById('tablesListContainer'),
                 summary: document.getElementById('summaryText'),
                 inputs: { w: document.getElementById('totalWidth'), h: document.getElementById('totalHeight') },
-                floatingInput: document.getElementById('floatingInput')
+                floatingInput: document.getElementById('floatingInput'),
+                visualTable: document.getElementById('visualTableContainer')
             },
 
             init: function () {
@@ -1007,85 +1281,41 @@
                 this.ui.wrapper.addEventListener('mousedown', (e) => {
                     if (e.button === 2) return;
                     if (e.target.classList.contains('resize-handle')) return;
-                    
-                    // Si on clique dans l'input texte, on ne fait rien
-                    if(e.target === this.ui.floatingInput) return;
-                    
-                    // Si l'input texte est ouvert, un clic ailleurs le valide
-                    if(this.ui.floatingInput.style.display === 'block') {
-                        this.confirmText();
-                        return;
-                    }
+                    if (e.target === this.ui.floatingInput) return;
+                    if (this.ui.floatingInput.style.display === 'block') { this.confirmText(); return; }
 
                     if (this.state.interactionMode === 'move') this.startAxesDrag(e);
                     else if (this.state.interactionMode === 'point') this.addPoint(e);
                     else if (this.state.interactionMode === 'text') this.addText(e);
                     else if (this.state.interactionMode === 'link' || this.state.interactionMode === 'circle' || this.state.interactionMode === 'curve') {
-                        // Logique "Fantôme" : Si on ne clique pas sur un point existant, on en crée un
-                        const isPointClick = e.target.tagName === 'circle' && e.target.parentElement.classList.contains('visual-marker') === false; 
-                        
-                        if(!isPointClick) {
-                            // On crée un point à la volée
-                            const newPointIndex = this.addPoint(e);
-                            // On simule le clic sur ce point
-                            this.handlePointClick(e, newPointIndex);
-                        }
+                        const isPointClick = e.target.tagName === 'circle' && e.target.parentElement.classList.contains('visual-marker') === false;
+                        if (!isPointClick) { const newPointIndex = this.addPoint(e); this.handlePointClick(e, newPointIndex); }
                     }
                 });
 
                 this.ui.wrapper.addEventListener('wheel', (e) => {
-                    if (e.ctrlKey || !e.ctrlKey) {
-                        e.preventDefault();
-                        const delta = e.deltaY > 0 ? -0.1 : 0.1;
-                        this.zoomView(delta);
-                    }
+                    if (e.ctrlKey || !e.ctrlKey) { e.preventDefault(); const delta = e.deltaY > 0 ? -0.1 : 0.1; this.zoomView(delta); }
                 }, { passive: false });
 
                 window.addEventListener('mousemove', (e) => this.onMouseMove(e));
                 window.addEventListener('mouseup', (e) => this.onMouseUp(e));
                 window.addEventListener('click', (e) => this.hideCtxMenu());
-                
-                // Gestion de l'input flottant
+
                 this.ui.floatingInput.addEventListener('keydown', (e) => {
-                    e.stopPropagation(); // Empêcher les raccourcis globaux
-                    if(e.key === 'Enter') this.confirmText();
-                    if(e.key === 'Escape') this.cancelText();
+                    e.stopPropagation(); if (e.key === 'Enter') this.confirmText(); if (e.key === 'Escape') this.cancelText();
                 });
-                
-                // SHORTCUTS
+
                 window.addEventListener('keydown', (e) => {
-                    if(document.querySelector('.modal').style.display === 'flex' && e.key !== 'Escape') return;
-                    if(this.ui.floatingInput.style.display === 'block') return; // Pas de raccourcis si on écrit
-
-                    // Undo / Redo
-                    if((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); this.undo(); return; }
-                    if((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); return; }
-
-                    if (e.key === "Escape") {
-                        if(this.state.activeCurve.length > 1) this.finishCurve();
-                        else {
-                            this.state.tempLinkStart = null;
-                            this.setMode('move');
-                            document.querySelectorAll('.modal').forEach(m => m.style.display='none');
-                            this.hideCtxMenu();
-                        }
-                    }
-                    if(e.key === "Enter" && this.state.interactionMode === 'curve') this.finishCurve();
-
-                    // Delete active
-                    if(e.key === 'Delete' || e.key === 'Backspace') {
-                        if(this.state.activeContext) this.deleteActiveItem();
-                    }
-
-                    // Tools
-                    if(e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
-                        switch(e.key.toLowerCase()) {
-                            case 'm': this.setMode('move'); break;
-                            case 'p': this.setMode('point'); break;
-                            case 'l': this.setMode('link'); break;
-                            case 's': this.setMode('curve'); break;
-                            case 'c': this.setMode('circle'); break;
-                            case 't': this.setMode('text'); break;
+                    if (document.querySelector('.modal').style.display === 'flex' && e.key !== 'Escape') return;
+                    if (this.ui.floatingInput.style.display === 'block') return;
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'z') { e.preventDefault(); this.undo(); return; }
+                    if ((e.ctrlKey || e.metaKey) && e.key === 'y') { e.preventDefault(); this.redo(); return; }
+                    if (e.key === "Escape") { if (this.state.activeCurve.length > 1) this.finishCurve(); else { this.state.tempLinkStart = null; this.setMode('move'); document.querySelectorAll('.modal').forEach(m => m.style.display = 'none'); this.hideCtxMenu(); } }
+                    if (e.key === "Enter" && this.state.interactionMode === 'curve') this.finishCurve();
+                    if (e.key === 'Delete' || e.key === 'Backspace') { if (this.state.activeContext) this.deleteActiveItem(); }
+                    if (e.target.tagName !== 'INPUT' && e.target.tagName !== 'TEXTAREA') {
+                        switch (e.key.toLowerCase()) {
+                            case 'm': this.setMode('move'); break; case 'p': this.setMode('point'); break; case 'l': this.setMode('link'); break; case 's': this.setMode('curve'); break; case 'c': this.setMode('circle'); break; case 't': this.setMode('text'); break;
                         }
                     }
                 });
@@ -1102,58 +1332,72 @@
                 });
             },
 
-            // --- UNDO / REDO SYSTEM ---
-            saveState: function() {
-                if(this.state.history.length > 50) this.state.history.shift();
+            // --- UNDO / REDO ---
+            saveState: function () {
+                if (this.state.history.length > 50) this.state.history.shift();
                 const stateClone = JSON.parse(JSON.stringify(this.state));
-                delete stateClone.history;
-                delete stateClone.redoStack;
-                this.state.history.push(stateClone);
-                this.state.redoStack = []; 
+                delete stateClone.history; delete stateClone.redoStack;
+                this.state.history.push(stateClone); this.state.redoStack = [];
             },
-
-            undo: function() {
-                if(this.state.history.length === 0) return;
+            undo: function () {
+                if (this.state.history.length === 0) return;
                 const currentState = JSON.parse(JSON.stringify(this.state));
-                delete currentState.history;
-                delete currentState.redoStack;
+                delete currentState.history; delete currentState.redoStack;
                 this.state.redoStack.push(currentState);
                 const prevState = this.state.history.pop();
                 this.restoreState(prevState);
             },
-
-            redo: function() {
-                if(this.state.redoStack.length === 0) return;
+            redo: function () {
+                if (this.state.redoStack.length === 0) return;
                 const currentState = JSON.parse(JSON.stringify(this.state));
-                delete currentState.history;
-                delete currentState.redoStack;
+                delete currentState.history; delete currentState.redoStack;
                 this.state.history.push(currentState);
                 const nextState = this.state.redoStack.pop();
                 this.restoreState(nextState);
             },
-
-            restoreState: function(stateData) {
-                Object.keys(stateData).forEach(k => {
-                    this.state[k] = stateData[k];
-                });
+            restoreState: function (stateData) {
+                Object.keys(stateData).forEach(k => { this.state[k] = stateData[k]; });
                 this.syncUI();
                 document.getElementById('headerGridPreset').value = (this.presets.grid[this.state.layers[0]?.name]) ? this.state.layers[0].name : "simple";
                 this.updateRender();
             },
 
-            // --- MAIN LOGIC ---
+            // --- SAVE / LOAD PROJECT ---
+            saveProject: function () {
+                const data = JSON.stringify(this.state);
+                const blob = new Blob([data], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = 'projet_prof_studio.json';
+                a.click();
+                URL.revokeObjectURL(url);
+            },
+            triggerLoad: function () {
+                document.getElementById('fileLoader').click();
+            },
+            handleFileLoad: function (input) {
+                const file = input.files[0];
+                if (!file) return;
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const newState = JSON.parse(e.target.result);
+                        this.restoreState(newState);
+                        this.state.history = []; // Clear history after load
+                        this.state.redoStack = [];
+                        this.showToast("Projet chargé !");
+                    } catch (err) {
+                        alert("Erreur lors du chargement du fichier.");
+                    }
+                };
+                reader.readAsText(file);
+                input.value = ''; // Reset input
+            },
 
-            toggleAxes: function () {
-                this.state.showAxes = !this.state.showAxes;
-                const checkbox = document.getElementById('showAxes');
-                if (checkbox) checkbox.checked = this.state.showAxes;
-                document.getElementById('btnToggleAxes').classList.toggle('active', this.state.showAxes);
-                this.updateRender();
-            },
-            toggleMagnet: function () {
-                this.state.magnetMode = !this.state.magnetMode;
-                document.getElementById('btnToggleMagnet').classList.toggle('active', this.state.magnetMode);
-            },
+            // --- MAIN LOGIC ---
+            toggleAxes: function () { this.state.showAxes = !this.state.showAxes; document.getElementById('showAxes').checked = this.state.showAxes; document.getElementById('btnToggleAxes').classList.toggle('active', this.state.showAxes); this.updateRender(); },
+            toggleMagnet: function () { this.state.magnetMode = !this.state.magnetMode; document.getElementById('btnToggleMagnet').classList.toggle('active', this.state.magnetMode); },
             toggleGridEditMode: function () {
                 this.state.isGridEditMode = !this.state.isGridEditMode;
                 document.getElementById('btnToggleGridEdit').classList.toggle('edit-mode-active', this.state.isGridEditMode);
@@ -1161,20 +1405,17 @@
                 document.getElementById('grid-edit-panel').style.display = this.state.isGridEditMode ? 'block' : 'none';
                 this.generateLayerUI();
             },
+
+            // --- GESTION GRILLES ---
             loadGridPreset: function (val) {
                 this.saveState();
                 if (!val) val = document.getElementById('headerGridPreset').value;
                 let preset;
-                if (this.presets.grid[val]) {
-                    preset = JSON.parse(JSON.stringify(this.presets.grid[val]));
-                } else {
-                    preset = JSON.parse(JSON.stringify(this.presets.grid['simple']));
-                }
+                if (this.presets.grid[val]) { preset = JSON.parse(JSON.stringify(this.presets.grid[val])); } else { preset = JSON.parse(JSON.stringify(this.presets.grid['simple'])); }
                 preset.forEach(l => { if (!l.s) l.s = "solid"; if (!l.dir) l.dir = "both"; });
                 this.state.layers = preset;
                 this.applyTheme(document.getElementById('themeSelector').value);
             },
-
             addLayer: function () {
                 this.saveState();
                 this.state.layers.push({ name: "Nouvelle Couche", m: 1, c: "#999999", w: 0.5, s: "solid", dir: "both" });
@@ -1198,6 +1439,213 @@
                 this.toggleGridEditMode();
                 alert("Grille sauvegardée !");
             },
+            applyTheme: function (themeName) {
+                const type = document.getElementById('headerGridPreset').value;
+                let preset;
+                if (this.presets.grid[type]) { preset = this.presets.themes[themeName][type] || this.presets.themes[themeName]['simple']; } else { preset = this.presets.themes[themeName]['simple']; }
+                this.state.layers.forEach((layer, index) => { if (preset && preset.length) layer.c = preset[index % preset.length]; });
+                this.generateLayerUI();
+                this.updateRender();
+            },
+            updateLayerConfig: function (index, prop, value) { this.saveState(); this.state.layers[index][prop] = value; this.updateRender(); },
+            updateLayerDir: function (index, dir) { this.saveState(); this.state.layers[index]['dir'] = dir; this.updateRender(); },
+            generateLayerUI: function () {
+                const isEdit = this.state.isGridEditMode;
+                const containerId = isEdit ? 'layers-container-edit' : 'layers-container-normal';
+                const container = document.getElementById(containerId);
+                if (!container) return;
+                container.innerHTML = '';
+                this.state.layers.forEach((layer, index) => {
+                    const div = document.createElement('div'); div.className = 'layer-item'; div.style.borderLeftColor = layer.c;
+                    let headerHtml = isEdit ? `<div class="layer-header" style="gap:5px;"><input type="text" class="layer-name-input" value="${layer.name}" oninput="app.updateLayerConfig(${index}, 'name', this.value)"><button class="obj-del" style="color:var(--danger);" onclick="app.removeLayer(${index})" title="Supprimer">🗑️</button></div>` : `<div class="layer-header"><span>${layer.name}</span></div>`;
+                    let extraEditHtml = isEdit ? `<div class="input-group"><label>Répétition (u)</label><input type="number" step="0.1" value="${layer.m}" oninput="app.updateLayerConfig(${index}, 'm', parseFloat(this.value))"></div>` : '';
+                    div.innerHTML = headerHtml + `<div class="control-row"><div class="input-group"><label>Couleur</label><input type="color" value="${layer.c}" oninput="app.updateLayerConfig(${index}, 'c', this.value)"></div><div class="input-group"><label>Épaisseur</label><input type="number" value="${layer.w}" step="0.1" oninput="app.updateLayerConfig(${index}, 'w', parseFloat(this.value))"></div></div>${extraEditHtml}<div class="control-row"><select onchange="app.updateLayerConfig(${index}, 's', this.value)" style="font-size:0.8rem; padding:4px;"><option value="solid" ${layer.s === 'solid' ? 'selected' : ''}>Continu</option><option value="dash" ${layer.s === 'dash' ? 'selected' : ''}>Tirets</option><option value="shortdash" ${layer.s === 'shortdash' ? 'selected' : ''}>Courts</option><option value="dot" ${layer.s === 'dot' ? 'selected' : ''}>Points</option></select><select onchange="app.updateLayerDir(${index}, this.value)" style="font-size:0.8rem; padding:4px;"><option value="both" ${(!layer.dir || layer.dir === 'both') ? 'selected' : ''}>Quadrillage (XY)</option><option value="h" ${layer.dir === 'h' ? 'selected' : ''}>Horizontal (H)</option><option value="v" ${layer.dir === 'v' ? 'selected' : ''}>Vertical (V)</option></select></div>`;
+                    container.appendChild(div);
+                });
+            },
+
+            // --- NOUVEAU: TABLEAU DE VARIATION VISUEL ---
+            openTableModal: function () {
+                // Initialize draft if empty
+                if (!this.state.tableDraft || this.state.tableDraft.length === 0) {
+                    this.state.tableDraft = [
+                        { type: 'val', x: '-inf', sign: '0', var: '' },
+                        { type: 'int', sign: '+', arr: 'up' },
+                        { type: 'val', x: '+inf', sign: '0', var: '' }
+                    ];
+                }
+                document.getElementById('showFPrime').checked = true;
+                this.renderTableDraft();
+                document.getElementById('table-modal').style.display = 'flex';
+            },
+
+            // --- ÉDITER UN TABLEAU EXISTANT ---
+            editActiveTable: function () {
+                if (!this.state.activeContext || this.state.activeContext.type !== 'table') return;
+
+                const idx = this.state.activeContext.index;
+                const t = this.state.tables[idx];
+
+                this.state.isEditingTable = true;
+                this.state.editingTableIndex = idx;
+
+                // Reconstruire le "draft" à partir des données du tableau
+                this.state.tableDraft = JSON.parse(JSON.stringify(t.draftData)); // On utilise la copie sauvegardée
+                document.getElementById('showFPrime').checked = t.showFPrime;
+
+                this.renderTableDraft();
+                document.getElementById('table-modal').style.display = 'flex';
+                this.hideCtxMenu();
+            },
+
+            toggleTableRows: function () {
+                this.renderTableDraft();
+            },
+
+            renderTableDraft: function () {
+                const c = this.ui.visualTable;
+                c.innerHTML = '';
+                const showPrime = document.getElementById('showFPrime').checked;
+
+                document.getElementById('tbHeaderPrime').style.display = showPrime ? 'flex' : 'none';
+
+                this.state.tableDraft.forEach((col, i) => {
+                    const div = document.createElement('div');
+                    div.className = `tb-column ${col.type === 'int' ? 'interval' : ''}`;
+
+                    // Ligne 1 : X input (only for val)
+                    const c1 = document.createElement('div'); c1.className = 'tb-cell';
+                    if (col.type === 'val') {
+                        c1.innerHTML = `<input class="tb-input" value="${col.x}" oninput="app.state.tableDraft[${i}].x = this.value">`;
+                    }
+                    div.appendChild(c1);
+
+                    // Ligne 2 : Sign Toggle (f') - Only if showPrime is true
+                    if (showPrime) {
+                        const c2 = document.createElement('div'); c2.className = 'tb-cell';
+                        c2.innerHTML = `<button class="tb-btn" onclick="app.cycleSign(${i})">${col.sign || '&nbsp;'}</button>`;
+                        div.appendChild(c2);
+                    }
+
+                    // Ligne 3 : Var/Arrow Toggle (f)
+                    const c3 = document.createElement('div'); c3.className = 'tb-cell';
+                    if (col.type === 'val') {
+                        c3.innerHTML = `<input class="tb-input" value="${col.var}" placeholder="f(x)" oninput="app.state.tableDraft[${i}].var = this.value">`;
+                    } else {
+                        const arrMap = { 'up': '↗', 'down': '↘' };
+                        c3.innerHTML = `<button class="tb-btn" onclick="app.cycleArr(${i})">${arrMap[col.arr] || '&nbsp;'}</button>`;
+                    }
+                    div.appendChild(c3);
+
+                    // Bouton Supprimer (sauf si trop peu de colonnes)
+                    if (this.state.tableDraft.length > 3) {
+                        const delBtn = document.createElement('button');
+                        delBtn.className = 'btn-del-col';
+                        delBtn.innerHTML = '×';
+                        delBtn.onclick = () => app.removeTableCol(i);
+                        div.appendChild(delBtn);
+                    }
+
+                    c.appendChild(div);
+                });
+            },
+
+            cycleSign: function (i) {
+                const opts = ['', '+', '-', '0', '|', '||'];
+                const curr = this.state.tableDraft[i].sign || '';
+                let idx = opts.indexOf(curr);
+                idx = (idx + 1) % opts.length;
+                this.state.tableDraft[i].sign = opts[idx];
+                this.renderTableDraft();
+            },
+            cycleArr: function (i) {
+                // Only for intervals
+                if (this.state.tableDraft[i].type !== 'int') return;
+                const opts = ['up', 'down'];
+                const curr = this.state.tableDraft[i].arr || 'up';
+                let idx = opts.indexOf(curr);
+                idx = (idx + 1) % opts.length;
+                this.state.tableDraft[i].arr = opts[idx];
+                this.renderTableDraft();
+            },
+            addTableColumn: function () {
+                // Add Interval + Value pair
+                this.state.tableDraft.push({ type: 'int', sign: '+', arr: 'up' });
+                this.state.tableDraft.push({ type: 'val', x: '?', sign: '0', var: '' });
+                this.renderTableDraft();
+            },
+            removeTableCol: function (i) {
+                // Remove column and its neighbor to keep Val-Int-Val structure
+                if (i > 0) {
+                    this.state.tableDraft.splice(i - 1, 2); // Remove prev and current
+                } else {
+                    this.state.tableDraft.splice(i, 2); // Remove current and next
+                }
+                this.renderTableDraft();
+            },
+
+            confirmTable: function () {
+                if (this.state.isEditingTable && this.state.editingTableIndex > -1) {
+                    // Update existing
+                    this.saveState();
+                    const t = this.state.tables[this.state.editingTableIndex];
+                    // On met à jour les données calculées à partir du draft
+                    const newData = this.processTableDraft(this.state.tableDraft);
+                    t.x = newData.x;
+                    t.fprime = newData.fprime;
+                    t.f = newData.f;
+                    t.showFPrime = document.getElementById('showFPrime').checked;
+                    t.draftData = JSON.parse(JSON.stringify(this.state.tableDraft)); // Update stored draft
+                } else {
+                    // Create new
+                    this.addTable();
+                }
+                document.getElementById('table-modal').style.display = 'none';
+                this.updateRender();
+            },
+
+            processTableDraft: function (draft) {
+                const tableData = { x: [], fprime: [], f: [] };
+                for (let i = 0; i < draft.length; i++) {
+                    if (draft[i].type === 'val') {
+                        tableData.x.push(draft[i].x);
+                        // Current val sign (0, |)
+                        let fp = { val: draft[i].sign, int: null };
+                        let fv = { val: draft[i].var, arrow: null };
+
+                        // Check next interval for sign and arrow
+                        if (i + 1 < draft.length && draft[i + 1].type === 'int') {
+                            fp.int = draft[i + 1].sign;
+                            fv.arrow = draft[i + 1].arr;
+                        }
+
+                        tableData.fprime.push(fp);
+                        tableData.f.push(fv);
+                    }
+                }
+                return tableData;
+            },
+
+            addTable: function () {
+                const draft = this.state.tableDraft;
+                const showPrime = document.getElementById('showFPrime').checked;
+                const tableData = this.processTableDraft(draft);
+
+                // On ajoute les métadonnées
+                tableData.showFPrime = showPrime;
+                tableData.pos = { x: this.state.width / 2 - 200, y: this.state.height / 2 - 80 };
+                tableData.draftData = JSON.parse(JSON.stringify(draft)); // IMPORTANT : Sauvegarder l'état brut pour l'édition
+
+                this.saveState();
+                if (!this.state.tables) this.state.tables = [];
+                this.state.tables.push(tableData);
+                this.updateRender();
+            },
+            deleteTable: function (index) {
+                this.saveState();
+                this.state.tables.splice(index, 1);
+                this.updateRender();
+            },
 
             renderObjectList: function () {
                 this.ui.pointsList.innerHTML = '';
@@ -1205,18 +1653,44 @@
                 else {
                     const ul = document.createElement('ul'); ul.className = 'obj-list';
                     this.state.points.forEach((p, i) => {
-                        const li = document.createElement('li'); li.className = 'obj-item';
-                        li.innerHTML = `<div class="obj-info"><span class="obj-marker" style="background:${p.color}"></span><strong>${p.label}</strong> (${p.u}; ${p.v})</div><button class="obj-del" onclick="app.deleteItem('point', ${i})">×</button>`;
+                        const li = document.createElement('li'); li.className = `obj-item ${p.visible === false ? 'hidden-item' : ''}`;
+                        const visIcon = (p.visible === false) ? '🙈' : '👁️';
+                        li.innerHTML = `
+                            <div class="obj-info"><span class="obj-marker" style="background:${p.color}"></span><strong>${p.label}</strong> (${p.u}; ${p.v})</div>
+                            <div class="obj-actions">
+                                <button class="obj-btn obj-vis" onclick="app.toggleVisibility('point', ${i})" title="Afficher/Masquer">${visIcon}</button>
+                                <button class="obj-btn obj-del" onclick="app.deleteItem('point', ${i})">×</button>
+                            </div>`;
                         ul.appendChild(li);
                     });
                     this.ui.pointsList.appendChild(ul);
                 }
-                
+
+                // LISTE DES TABLEAUX
+                this.ui.tablesList.innerHTML = '';
+                if (!this.state.tables || this.state.tables.length === 0) {
+                    this.ui.tablesList.innerHTML = '<div class="empty-msg">Aucun tableau</div>';
+                } else {
+                    const ul = document.createElement('ul'); ul.className = 'obj-list';
+                    this.state.tables.forEach((t, i) => {
+                        const li = document.createElement('li'); li.className = `obj-item ${t.visible === false ? 'hidden-item' : ''}`;
+                        const visIcon = (t.visible === false) ? '🙈' : '👁️';
+                        li.innerHTML = `
+                            <div class="obj-info">Tableau (${t.x.length} cols)</div>
+                            <div class="obj-actions">
+                                <button class="obj-btn obj-vis" onclick="app.toggleVisibility('table', ${i})" title="Afficher/Masquer">${visIcon}</button>
+                                <button class="obj-btn obj-del" onclick="app.deleteTable(${i})">×</button>
+                            </div>`;
+                        ul.appendChild(li);
+                    });
+                    this.ui.tablesList.appendChild(ul);
+                }
+
                 this.ui.linksList.innerHTML = '';
                 const hasLinks = this.state.links.length > 0;
                 const hasCurves = this.state.curves.length > 0;
                 const hasCircles = this.state.circles && this.state.circles.length > 0;
-                
+
                 if (!hasLinks && !hasCurves && !hasCircles) this.ui.linksList.innerHTML = '<div class="empty-msg">Aucun objet géométrique</div>';
                 else {
                     const ul = document.createElement('ul'); ul.className = 'obj-list';
@@ -1227,23 +1701,41 @@
                             const isVector = l.type === 'vector';
                             const typeName = isVector ? 'Vecteur' : 'Segment';
                             const notation = isVector ? `${p1.label}${p2.label}` : `[${p1.label}${p2.label}]`;
-                            const li = document.createElement('li'); li.className = 'obj-item';
-                            li.innerHTML = `<div class="obj-info"><span class="obj-marker" style="background:${l.color}; width:15px; border-radius:0; height:3px;"></span> ${typeName} ${notation}</div><button class="obj-del" onclick="app.deleteItem('link', ${i})">×</button>`;
+                            const li = document.createElement('li'); li.className = `obj-item ${l.visible === false ? 'hidden-item' : ''}`;
+                            const visIcon = (l.visible === false) ? '🙈' : '👁️';
+                            li.innerHTML = `
+                                <div class="obj-info"><span class="obj-marker" style="background:${l.color}; width:15px; border-radius:0; height:3px;"></span> ${typeName} ${notation}</div>
+                                <div class="obj-actions">
+                                    <button class="obj-btn obj-vis" onclick="app.toggleVisibility('link', ${i})">${visIcon}</button>
+                                    <button class="obj-btn obj-del" onclick="app.deleteItem('link', ${i})">×</button>
+                                </div>`;
                             ul.appendChild(li);
                         }
                     });
                     this.state.curves.forEach((c, i) => {
-                        const li = document.createElement('li'); li.className = 'obj-item';
-                        li.innerHTML = `<div class="obj-info"><span class="obj-marker" style="background:${c.color}; width:15px; border-radius:0; height:3px;"></span> Courbe (${c.pts.length} pts)</div><button class="obj-del" onclick="app.deleteItem('curve', ${i})">×</button>`;
+                        const li = document.createElement('li'); li.className = `obj-item ${c.visible === false ? 'hidden-item' : ''}`;
+                        const visIcon = (c.visible === false) ? '🙈' : '👁️';
+                        li.innerHTML = `
+                            <div class="obj-info"><span class="obj-marker" style="background:${c.color}; width:15px; border-radius:0; height:3px;"></span> Courbe (${c.pts.length} pts)</div>
+                            <div class="obj-actions">
+                                <button class="obj-btn obj-vis" onclick="app.toggleVisibility('curve', ${i})">${visIcon}</button>
+                                <button class="obj-btn obj-del" onclick="app.deleteItem('curve', ${i})">×</button>
+                            </div>`;
                         ul.appendChild(li);
                     });
-                      if(this.state.circles) {
+                    if (this.state.circles) {
                         this.state.circles.forEach((c, i) => {
                             const p1 = this.state.points[c.center];
                             const p2 = this.state.points[c.edge];
-                            if(p1 && p2) {
-                                const li = document.createElement('li'); li.className = 'obj-item';
-                                li.innerHTML = `<div class="obj-info"><span class="obj-marker" style="background:transparent; border:2px solid ${c.color}; width:12px; height:12px; border-radius:50%;"></span> Cercle (C:${p1.label})</div><button class="obj-del" onclick="app.deleteItem('circle', ${i})">×</button>`;
+                            if (p1 && p2) {
+                                const li = document.createElement('li'); li.className = `obj-item ${c.visible === false ? 'hidden-item' : ''}`;
+                                const visIcon = (c.visible === false) ? '🙈' : '👁️';
+                                li.innerHTML = `
+                                    <div class="obj-info"><span class="obj-marker" style="background:transparent; border:2px solid ${c.color}; width:12px; height:12px; border-radius:50%;"></span> Cercle (C:${p1.label})</div>
+                                    <div class="obj-actions">
+                                        <button class="obj-btn obj-vis" onclick="app.toggleVisibility('circle', ${i})">${visIcon}</button>
+                                        <button class="obj-btn obj-del" onclick="app.deleteItem('circle', ${i})">×</button>
+                                    </div>`;
                                 ul.appendChild(li);
                             }
                         });
@@ -1257,8 +1749,14 @@
                 else {
                     const ul = document.createElement('ul'); ul.className = 'obj-list';
                     this.state.texts.forEach((t, i) => {
-                        const li = document.createElement('li'); li.className = 'obj-item';
-                        li.innerHTML = `<div class="obj-info"><strong>"</strong>${t.content}<strong>"</strong></div><button class="obj-del" onclick="app.deleteItem('text', ${i})">×</button>`;
+                        const li = document.createElement('li'); li.className = `obj-item ${t.visible === false ? 'hidden-item' : ''}`;
+                        const visIcon = (t.visible === false) ? '🙈' : '👁️';
+                        li.innerHTML = `
+                            <div class="obj-info"><strong>"</strong>${t.content}<strong>"</strong></div>
+                            <div class="obj-actions">
+                                <button class="obj-btn obj-vis" onclick="app.toggleVisibility('text', ${i})">${visIcon}</button>
+                                <button class="obj-btn obj-del" onclick="app.deleteItem('text', ${i})">×</button>
+                            </div>`;
                         ul.appendChild(li);
                     });
                     this.ui.textsList.appendChild(ul);
@@ -1270,8 +1768,14 @@
                 else {
                     const ul = document.createElement('ul'); ul.className = 'obj-list';
                     this.state.functions.forEach((f, i) => {
-                        const li = document.createElement('li'); li.className = 'obj-item';
-                        li.innerHTML = `<div class="obj-info"><span class="obj-marker" style="background:${f.color}; width:15px; height:3px; border-radius:0;"></span> <em>f(x) = ${f.expr}</em></div><button class="obj-del" onclick="app.deleteItem('function', ${i})">×</button>`;
+                        const li = document.createElement('li'); li.className = `obj-item ${f.visible === false ? 'hidden-item' : ''}`;
+                        const visIcon = (f.visible === false) ? '🙈' : '👁️';
+                        li.innerHTML = `
+                            <div class="obj-info"><span class="obj-marker" style="background:${f.color}; width:15px; height:3px; border-radius:0;"></span> <em>f(x) = ${f.expr}</em></div>
+                            <div class="obj-actions">
+                                <button class="obj-btn obj-vis" onclick="app.toggleVisibility('function', ${i})">${visIcon}</button>
+                                <button class="obj-btn obj-del" onclick="app.deleteItem('function', ${i})">×</button>
+                            </div>`;
                         ul.appendChild(li);
                     });
                     this.ui.funcsList.appendChild(ul);
@@ -1279,35 +1783,30 @@
                 this.generateSummary();
             },
 
+            toggleVisibility: function (type, index) {
+                this.saveState();
+                let arr;
+                if (type === 'point') arr = this.state.points;
+                else if (type === 'link') arr = this.state.links;
+                else if (type === 'curve') arr = this.state.curves;
+                else if (type === 'circle') arr = this.state.circles;
+                else if (type === 'text') arr = this.state.texts;
+                else if (type === 'function') arr = this.state.functions;
+                else if (type === 'table') arr = this.state.tables;
+
+                if (arr && arr[index]) {
+                    // Toggle undefined or true to false, false to true
+                    arr[index].visible = (arr[index].visible === false) ? true : false;
+                }
+                this.updateRender();
+            },
+
             generateSummary: function () {
                 let txt = "";
-                if (this.state.points.length > 0) {
-                    txt += "Points :\n";
-                    this.state.points.forEach(p => { txt += `- ${p.label}(${p.u} ; ${p.v})\n`; });
-                }
-                if (this.state.links.length > 0) {
-                    txt += "\nLiaisons :\n";
-                    this.state.links.forEach(l => {
-                        const p1 = this.state.points[l.from]; const p2 = this.state.points[l.to];
-                        if (p1 && p2) {
-                            const type = l.type === 'vector' ? 'Vecteur' : 'Segment';
-                            const notation = (l.type === 'vector') ? `${p1.label}${p2.label}` : `[${p1.label}${p2.label}]`;
-                            txt += `- ${type} ${notation}\n`;
-                        }
-                    });
-                }
-                if (this.state.circles && this.state.circles.length > 0) {
-                      txt += "\nCercles :\n";
-                      this.state.circles.forEach(c => {
-                          const p1 = this.state.points[c.center];
-                          const p2 = this.state.points[c.edge];
-                          if(p1 && p2) txt += `- Cercle de centre ${p1.label} passant par ${p2.label}\n`;
-                      });
-                }
-                if (this.state.functions.length > 0) {
-                    txt += "\nFonctions :\n";
-                    this.state.functions.forEach(f => { txt += `- f(x) = ${f.expr}\n`; });
-                }
+                if (this.state.points.length > 0) { txt += "Points :\n"; this.state.points.forEach(p => { if (p.visible !== false) txt += `- ${p.label}(${p.u} ; ${p.v})\n`; }); }
+                if (this.state.links.length > 0) { txt += "\nLiaisons :\n"; this.state.links.forEach(l => { if (l.visible === false) return; const p1 = this.state.points[l.from]; const p2 = this.state.points[l.to]; if (p1 && p2) { const type = l.type === 'vector' ? 'Vecteur' : 'Segment'; const notation = (l.type === 'vector') ? `${p1.label}${p2.label}` : `[${p1.label}${p2.label}]`; txt += `- ${type} ${notation}\n`; } }); }
+                if (this.state.circles && this.state.circles.length > 0) { txt += "\nCercles :\n"; this.state.circles.forEach(c => { if (c.visible === false) return; const p1 = this.state.points[c.center]; const p2 = this.state.points[c.edge]; if (p1 && p2) txt += `- Cercle de centre ${p1.label} passant par ${p2.label}\n`; }); }
+                if (this.state.functions.length > 0) { txt += "\nFonctions :\n"; this.state.functions.forEach(f => { if (f.visible !== false) txt += `- f(x) = ${f.expr}\n`; }); }
                 this.ui.summary.value = txt;
             },
 
@@ -1317,13 +1816,11 @@
                     this.state.links = this.state.links.filter(l => l.from !== index && l.to !== index);
                     this.state.curves.forEach(c => { c.pts = c.pts.filter(pid => pid !== index); });
                     this.state.curves = this.state.curves.filter(c => c.pts.length > 1);
-                    if(this.state.circles) this.state.circles = this.state.circles.filter(c => c.center !== index && c.edge !== index);
-                    
+                    if (this.state.circles) this.state.circles = this.state.circles.filter(c => c.center !== index && c.edge !== index);
                     const shift = (idx) => idx > index ? idx - 1 : idx;
                     this.state.links.forEach(l => { l.from = shift(l.from); l.to = shift(l.to); });
                     this.state.curves.forEach(c => { c.pts = c.pts.map(pid => shift(pid)); });
-                    if(this.state.circles) this.state.circles.forEach(c => { c.center = shift(c.center); c.edge = shift(c.edge); });
-                    
+                    if (this.state.circles) this.state.circles.forEach(c => { c.center = shift(c.center); c.edge = shift(c.edge); });
                     this.state.points.splice(index, 1);
                 } else if (type === 'link') { this.state.links.splice(index, 1); }
                 else if (type === 'curve') { this.state.curves.splice(index, 1); }
@@ -1336,149 +1833,122 @@
             handlePointClick: function (e, index) {
                 e.stopPropagation();
                 if (this.state.interactionMode === 'link') {
-                    if (this.state.tempLinkStart === null) {
-                        this.state.tempLinkStart = index;
-                    } else {
-                        if (this.state.tempLinkStart !== index) {
-                            this.saveState();
-                            this.state.links.push({
-                                from: this.state.tempLinkStart, to: index,
-                                type: document.getElementById('linkType').value,
-                                color: document.getElementById('linkColor').value,
-                                width: document.getElementById('linkWidth').value,
-                                dashed: document.getElementById('linkDashed').checked
-                            });
-                        }
-                        this.state.tempLinkStart = null;
-                    }
+                    if (this.state.tempLinkStart === null) { this.state.tempLinkStart = index; } else { if (this.state.tempLinkStart !== index) { this.saveState(); this.state.links.push({ from: this.state.tempLinkStart, to: index, type: document.getElementById('linkType').value, color: document.getElementById('linkColor').value, width: document.getElementById('linkWidth').value, dashed: document.getElementById('linkDashed').checked }); } this.state.tempLinkStart = null; }
                 } else if (this.state.interactionMode === 'curve') {
                     this.state.activeCurve.push(index);
                 } else if (this.state.interactionMode === 'circle') {
-                    if (this.state.tempLinkStart === null) {
-                        this.state.tempLinkStart = index; // Center
-                    } else {
-                        if (this.state.tempLinkStart !== index) {
-                            this.saveState();
-                            if(!this.state.circles) this.state.circles = [];
-                            this.state.circles.push({
-                                center: this.state.tempLinkStart, edge: index,
-                                color: document.getElementById('linkColor').value,
-                                width: document.getElementById('linkWidth').value,
-                                dashed: document.getElementById('linkDashed').checked
-                            });
-                        }
-                        this.state.tempLinkStart = null;
-                    }
+                    if (this.state.tempLinkStart === null) { this.state.tempLinkStart = index; } else { if (this.state.tempLinkStart !== index) { this.saveState(); if (!this.state.circles) this.state.circles = []; this.state.circles.push({ center: this.state.tempLinkStart, edge: index, color: document.getElementById('linkColor').value, width: document.getElementById('linkWidth').value, dashed: document.getElementById('linkDashed').checked }); } this.state.tempLinkStart = null; }
                 }
                 this.updateRender();
             },
 
             finishCurve: function () {
-                if (this.state.activeCurve.length > 1) {
-                    this.saveState();
-                    this.state.curves.push({
-                        pts: [...this.state.activeCurve],
-                        color: document.getElementById('linkColor').value,
-                        width: document.getElementById('linkWidth').value,
-                        dashed: document.getElementById('linkDashed').checked
-                    });
-                }
-                this.state.activeCurve = [];
-                this.updateRender();
+                if (this.state.activeCurve.length > 1) { this.saveState(); this.state.curves.push({ pts: [...this.state.activeCurve], color: document.getElementById('linkColor').value, width: document.getElementById('linkWidth').value, dashed: document.getElementById('linkDashed').checked }); }
+                this.state.activeCurve = []; this.updateRender();
             },
 
-            // --- FUNCTION PLOTTER ---
             addFunction: function () {
-                const expr = document.getElementById('funcInput').value;
-                if (!expr) return;
-                try {
-                    const safeExpr = this.cleanFormula(expr);
-                    new Function('x', 'return ' + safeExpr)(0);
-                    this.saveState();
-                    this.state.functions.push({
-                        expr: expr, safeExpr: safeExpr,
-                        color: document.getElementById('funcColor').value,
-                        width: document.getElementById('funcWidth').value
-                    });
-                    this.updateRender();
-                } catch (e) { alert("Erreur de syntaxe."); }
+                const expr = document.getElementById('funcInput').value; if (!expr) return;
+                try { const safeExpr = this.cleanFormula(expr); new Function('x', 'return ' + safeExpr)(0); this.saveState(); this.state.functions.push({ expr: expr, safeExpr: safeExpr, color: document.getElementById('funcColor').value, width: document.getElementById('funcWidth').value }); this.updateRender(); } catch (e) { alert("Erreur de syntaxe."); }
             },
-
-            cleanFormula: function (expr) {
-                return expr.toLowerCase().replace(/\^/g, '**').replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan').replace(/sqrt/g, 'Math.sqrt').replace(/abs/g, 'Math.abs').replace(/ln/g, 'Math.log').replace(/exp/g, 'Math.exp').replace(/pi/g, 'Math.PI');
-            },
+            cleanFormula: function (expr) { return expr.toLowerCase().replace(/\^/g, '**').replace(/sin/g, 'Math.sin').replace(/cos/g, 'Math.cos').replace(/tan/g, 'Math.tan').replace(/sqrt/g, 'Math.sqrt').replace(/abs/g, 'Math.abs').replace(/ln/g, 'Math.log').replace(/exp/g, 'Math.exp').replace(/pi/g, 'Math.PI'); },
 
             openExportModal: function () { document.getElementById('export-modal').style.display = 'flex'; },
             openHelpModal: function () { document.getElementById('help-modal').style.display = 'flex'; },
-            
-         performExport: function (action) {
-                const format = document.getElementById('exportFormat').value;
 
-                // --- CAS TIKZ / LATEX ---
+            performExport: function (action) {
+                const format = document.getElementById('exportFormat').value;
                 if (format === 'tikz') {
                     const code = this.generateTikZ();
-                    if (action === 'copy') {
-                        navigator.clipboard.writeText(code).then(() => app.showToast("Code LaTeX copié !"));
-                    } else {
-                        const blob = new Blob([code], { type: 'text/plain' });
-                        const link = document.createElement('a');
-                        link.href = URL.createObjectURL(blob);
-                        link.download = "figure.tex";
-                        link.click();
-                    }
-                    document.getElementById('export-modal').style.display = 'none';
-                    return;
+                    if (action === 'copy') { navigator.clipboard.writeText(code).then(() => app.showToast("Code LaTeX copié !")); } else { const blob = new Blob([code], { type: 'text/plain' }); const link = document.createElement('a'); link.href = URL.createObjectURL(blob); link.download = "figure.tex"; link.click(); }
+                    document.getElementById('export-modal').style.display = 'none'; return;
                 }
-
-                // --- CAS PNG / SVG (Existant) ---
-                const currentZoom = this.state.viewZoom;
-                this.state.viewZoom = 1; this.applyZoomCSS();
-                
+                const currentZoom = this.state.viewZoom; this.state.viewZoom = 1; this.applyZoomCSS();
                 const scale = parseInt(document.getElementById('exportQuality').value);
                 const svgEl = this.ui.wrapper.querySelector('svg');
-
-                if (format === 'svg') {
-                    const data = new XMLSerializer().serializeToString(svgEl);
-                    const blob = new Blob([data], { type: 'image/svg+xml' });
-                    const url = URL.createObjectURL(blob);
-                    const link = document.createElement('a'); link.href = url; link.download = `Grille.svg`; link.click();
-                } else {
-                    const canvas = document.createElement('canvas');
-                    canvas.width = this.state.width * scale; canvas.height = this.state.height * scale;
-                    const ctx = canvas.getContext('2d');
-                    const data = new XMLSerializer().serializeToString(svgEl);
-                    const img = new Image();
-                    const svgBlob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' });
-                    const url = URL.createObjectURL(svgBlob);
-                    img.onload = function () {
-                        ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-                        canvas.toBlob(function (blob) {
-                            if (action === 'copy') {
-                                try {
-                                    navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => app.showToast("Image copiée !"));
-                                }
-                                catch (err) { alert('Navigateur non supporté.'); }
-                            } else {
-                                const link = document.createElement('a'); link.download = `Grille.png`; link.href = URL.createObjectURL(blob); link.click();
-                            }
-                            URL.revokeObjectURL(url);
-                        });
-                    };
-                    img.src = url;
+                if (format === 'svg') { const data = new XMLSerializer().serializeToString(svgEl); const blob = new Blob([data], { type: 'image/svg+xml' }); const url = URL.createObjectURL(blob); const link = document.createElement('a'); link.href = url; link.download = `Grille.svg`; link.click(); } else {
+                    const canvas = document.createElement('canvas'); canvas.width = this.state.width * scale; canvas.height = this.state.height * scale; const ctx = canvas.getContext('2d'); const data = new XMLSerializer().serializeToString(svgEl); const img = new Image(); const svgBlob = new Blob([data], { type: 'image/svg+xml;charset=utf-8' }); const url = URL.createObjectURL(svgBlob);
+                    img.onload = function () { ctx.fillStyle = "white"; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.drawImage(img, 0, 0, canvas.width, canvas.height); canvas.toBlob(function (blob) { if (action === 'copy') { try { navigator.clipboard.write([new ClipboardItem({ 'image/png': blob })]).then(() => app.showToast("Image copiée !")); } catch (err) { alert('Navigateur non supporté.'); } } else { const link = document.createElement('a'); link.download = `Grille.png`; link.href = URL.createObjectURL(blob); link.click(); } URL.revokeObjectURL(url); }); }; img.src = url;
                 }
-                this.state.viewZoom = currentZoom; this.applyZoomCSS();
-                document.getElementById('export-modal').style.display = 'none';
+                this.state.viewZoom = currentZoom; this.applyZoomCSS(); document.getElementById('export-modal').style.display = 'none';
             },
 
-            // --- NOUVELLE FONCTION TIKZ ---
-// --- FONCTION TIKZ FINALE ET CORRIGÉE ---
-        // --- FONCTION TIKZ (Épaisseurs précises en 'pt') ---
+            showToast: function (msg) { const t = document.getElementById('toast'); t.textContent = msg || "Opération effectuée"; t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000); },
+            showCtxMenu: function (e, type, index) {
+                e.preventDefault(); e.stopPropagation(); this.state.activeContext = { type, index }; const menu = this.ui.ctxMenu;
+
+                // Reset display
+                document.getElementById('ctxEditBtn').style.display = 'none';
+
+                if (type === 'table') {
+                    document.getElementById('ctxTitle').innerText = "Modifier Tableau";
+                    document.getElementById('ctxNameRow').style.display = 'none';
+                    document.getElementById('ctxShowCoordsRow').style.display = 'none';
+                    document.getElementById('ctxColorRow').style.display = 'none';
+                    document.getElementById('ctxEditBtn').style.display = 'block';
+                }
+                else if (type === 'point') {
+                    const p = this.state.points[index]; document.getElementById('ctxTitle').innerText = "Modifier Point"; document.getElementById('ctxNameRow').style.display = 'block'; document.getElementById('ctxName').value = p.label; document.getElementById('ctxShowCoordsRow').style.display = 'block'; document.getElementById('ctxShowCoords').checked = p.showCoords || false; document.getElementById('ctxColorRow').style.display = 'block'; document.getElementById('ctxColor').value = p.color;
+                } else if (type === 'text') {
+                    const t = this.state.texts[index]; document.getElementById('ctxTitle').innerText = "Modifier Texte"; document.getElementById('ctxNameRow').style.display = 'block'; document.getElementById('ctxName').value = t.content; document.getElementById('ctxShowCoordsRow').style.display = 'none'; document.getElementById('ctxColorRow').style.display = 'block'; document.getElementById('ctxColor').value = t.color;
+                } else { let l; if (type === 'link') l = this.state.links[index]; else if (type === 'curve') l = this.state.curves[index]; else if (type === 'circle') l = this.state.circles[index]; else if (type === 'function') l = this.state.functions[index]; document.getElementById('ctxTitle').innerText = "Modifier"; document.getElementById('ctxNameRow').style.display = 'none'; document.getElementById('ctxShowCoordsRow').style.display = 'none'; document.getElementById('ctxColorRow').style.display = 'block'; document.getElementById('ctxColor').value = l.color; }
+                const parentRect = document.getElementById('preview-container').getBoundingClientRect(); const relX = (e.clientX - parentRect.left) / this.state.viewZoom; const relY = (e.clientY - parentRect.top) / this.state.viewZoom; menu.style.display = 'block'; menu.style.left = relX + 'px'; menu.style.top = relY + 'px';
+            },
+            hideCtxMenu: function () { this.ui.ctxMenu.style.display = 'none'; },
+            updateFromCtx: function (prop, val) {
+                if (!this.state.activeContext) return; const { type, index } = this.state.activeContext;
+                if (type === 'point') this.state.points[index][prop] = val;
+                else if (type === 'text') { if (prop === 'label') this.state.texts[index].content = val; if (prop === 'color') this.state.texts[index].color = val; }
+                else if (type === 'link') { if (prop === 'color') this.state.links[index].color = val; }
+                else if (type === 'curve') { if (prop === 'color') this.state.curves[index].color = val; }
+                else if (type === 'circle') { if (prop === 'color') this.state.circles[index].color = val; }
+                else if (type === 'function') { if (prop === 'color') this.state.functions[index].color = val; }
+                this.updateRender();
+            },
+            deleteActiveItem: function () { if (!this.state.activeContext) return; this.deleteItem(this.state.activeContext.type, this.state.activeContext.index); this.state.activeContext = null; this.hideCtxMenu(); },
+            getAvailableLabel: function () { const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"; let i = 0; while (true) { const charIndex = i % 26; const cycle = Math.floor(i / 26); const suffix = "'".repeat(cycle); const candidate = alphabet[charIndex] + suffix; if (!this.state.points.some(p => p.label === candidate)) return candidate; i++; } },
+            getMousePos: function (e) { const rect = this.ui.wrapper.getBoundingClientRect(); return { x: (e.clientX - rect.left) / this.state.viewZoom, y: (e.clientY - rect.top) / this.state.viewZoom }; },
+            addPoint: function (e) { this.saveState(); const pos = this.getMousePos(e); let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; } this.state.points.push({ u: lu, v: lv, label: this.getAvailableLabel(), color: "#e74c3c", showCoords: false }); this.updateRender(); return this.state.points.length - 1; },
+
+            addText: function (e) { const pos = this.getMousePos(e); let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; this.state.tempTextPos = { u: lu, v: lv }; this.ui.floatingInput.style.display = 'block'; this.ui.floatingInput.style.left = e.clientX + 'px'; this.ui.floatingInput.style.top = e.clientY + 'px'; this.ui.floatingInput.value = ''; this.ui.floatingInput.focus(); },
+            confirmText: function () { const content = this.ui.floatingInput.value.trim(); if (content && this.state.tempTextPos) { this.saveState(); if (!this.state.texts) this.state.texts = []; this.state.texts.push({ u: this.state.tempTextPos.u, v: this.state.tempTextPos.v, content: content, color: "#333" }); this.updateRender(); this.setMode('move'); } this.cancelText(); },
+            cancelText: function () { this.ui.floatingInput.style.display = 'none'; this.ui.floatingInput.value = ''; this.state.tempTextPos = null; },
+            recenterAxes: function () { this.saveState(); this.state.axisX = this.state.width / 2; this.state.axisY = this.state.height / 2; this.updateRender(); },
+            getSmoothPath: function (ptIndices) { if (ptIndices.length < 2) return ""; const coords = ptIndices.map(i => { const p = this.state.points[i]; return { x: this.state.axisX + p.u * this.state.baseUnit, y: this.state.axisY - p.v * this.state.baseUnit }; }); if (coords.length === 2) return `M ${coords[0].x} ${coords[0].y} L ${coords[1].x} ${coords[1].y}`; let d = `M ${coords[0].x} ${coords[0].y}`; for (let i = 0; i < coords.length - 1; i++) { const p0 = coords[i === 0 ? 0 : i - 1]; const p1 = coords[i]; const p2 = coords[i + 1]; const p3 = coords[i + 2] || p2; const cp1x = p1.x + (p2.x - p0.x) / 6; const cp1y = p1.y + (p2.y - p0.y) / 6; const cp2x = p2.x - (p3.x - p1.x) / 6; const cp2y = p2.y - (p3.y - p1.y) / 6; d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`; } return d; },
+            renderGhost: function (pos) { if (this.state.interactionMode !== 'point') return ""; let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; } const px = this.state.axisX + lu * this.state.baseUnit; const py = this.state.axisY - lv * this.state.baseUnit; const col = "#e74c3c"; let svg = `<g style="pointer-events:none;">`; svg += `<line x1="${px}" y1="${py}" x2="${px}" y2="${this.state.axisY}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; svg += `<line x1="${px}" y1="${py}" x2="${this.state.axisX}" y2="${py}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`; const s = 5; svg += `<path d="M ${px - s} ${py - s} L ${px + s} ${py + s} M ${px - s} ${py + s} L ${px + s} ${py - s}" stroke="${col}" stroke-width="2"/>`; svg += `<text x="${px + 8}" y="${py - 8}" font-family="Arial" font-size="12" fill="${col}" font-weight="bold">(${lu}; ${lv})</text></g>`; return svg; },
+            setMode: function (mode) { if (this.state.activeCurve.length > 0) this.finishCurve(); this.state.interactionMode = mode; this.state.tempLinkStart = null; document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active')); const instructions = { 'move': "Déplacez les axes ou redimensionnez.", 'point': "Cliquez pour placer un point.", 'link': "Clic point départ -> Clic point arrivée.", 'curve': "Clics successifs. 'Entrée' pour finir.", 'circle': "Clic centre -> Clic point du bord.", 'text': "Cliquez pour écrire.", 'function': "Remplissez f(x) à gauche." }; if (instructions[mode]) this.showToast(instructions[mode]); const mapBtn = { 'move': 'btnModeMove', 'point': 'btnModePoint', 'link': 'btnModeLink', 'curve': 'btnModeCurve', 'circle': 'btnModeCircle', 'text': 'btnModeText', 'function': 'btnModeFunction' }; if (mapBtn[mode]) document.getElementById(mapBtn[mode]).classList.add('active'); this.ui.wrapper.style.cursor = (mode === 'move') ? 'default' : (mode === 'point' ? 'crosshair' : 'pointer'); document.getElementById('tool-settings-panel').style.display = (mode === 'link' || mode === 'curve' || mode === 'circle') ? 'block' : 'none'; document.getElementById('function-settings-panel').style.display = (mode === 'function') ? 'block' : 'none'; this.updateRender(); },
+            zoomView: function (delta) { this.state.viewZoom += delta; if (this.state.viewZoom < 0.2) this.state.viewZoom = 0.2; if (this.state.viewZoom > 5) this.state.viewZoom = 5; this.applyZoomCSS(); },
+            applyZoomCSS: function () { this.ui.wrapper.style.transform = `scale(${this.state.viewZoom})`; },
+            zoom: function (delta) { this.zoomView(delta > 0 ? 0.1 : -0.1); },
+            applySizePreset: function () { this.saveState(); const val = document.getElementById('sizePreset').value; if (val === 'custom') return; const size = this.presets.sizes[val]; this.setSize(size.w, size.h); },
+            setSize: function (w, h) { this.state.width = w; this.state.height = h; this.state.axisX = w / 2; this.state.axisY = h / 2; this.syncUI(); this.updateRender(); },
+            syncUI: function () { this.ui.inputs.w.value = Math.round(this.state.width); this.ui.inputs.h.value = Math.round(this.state.height); this.ui.wrapper.style.width = this.state.width + 'px'; this.ui.wrapper.style.height = this.state.height + 'px'; },
+            drag: { active: false, startX: 0, startY: 0, startW: 0, startH: 0, startAx: 0, startAy: 0 },
+            startResize: function (e, dir) { e.stopPropagation(); this.drag = { active: true, mode: 'resize', dir: dir, startX: e.clientX, startY: e.clientY, startW: this.state.width, startH: this.state.height }; this.ui.wrapper.classList.add('no-transition'); this.ui.overlay.classList.add('visible'); },
+            startAxesDrag: function (e) { this.drag = { active: true, mode: 'axes', startX: e.clientX, startY: e.clientY, startAx: this.state.axisX, startAy: this.state.axisY }; this.ui.wrapper.style.cursor = 'move'; },
+            onMouseMove: function (e) {
+                const pos = this.getMousePos(e); if (!this.drag.active && this.state.interactionMode === 'point') { let ghostG = document.getElementById('ghost-layer'); if (!ghostG) { if (this.ui.wrapper.querySelector('svg')) this.updateRender(); return; } ghostG.innerHTML = this.renderGhost(pos); } if (!this.drag.active && ((this.state.interactionMode === 'link' && this.state.tempLinkStart !== null) || (this.state.interactionMode === 'circle' && this.state.tempLinkStart !== null) || (this.state.interactionMode === 'curve' && this.state.activeCurve.length > 0))) { let ghostG = document.getElementById('ghost-layer'); if (ghostG) { const startIdx = (this.state.interactionMode === 'link' || this.state.interactionMode === 'circle') ? this.state.tempLinkStart : this.state.activeCurve[this.state.activeCurve.length - 1]; const p1 = this.state.points[startIdx]; const x1 = this.state.axisX + p1.u * this.state.baseUnit; const y1 = this.state.axisY - p1.v * this.state.baseUnit; let lu = (pos.x - this.state.axisX) / this.state.baseUnit; let lv = (this.state.axisY - pos.y) / this.state.baseUnit; if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; } const x2 = this.state.axisX + lu * this.state.baseUnit; const y2 = this.state.axisY - lv * this.state.baseUnit; let snapped = false; this.state.points.forEach((p, i) => { if (i !== startIdx) { const px = this.state.axisX + p.u * this.state.baseUnit; const py = this.state.axisY - p.v * this.state.baseUnit; if (Math.abs(pos.x - px) < 15 && Math.abs(pos.y - py) < 15) { if (this.state.interactionMode === 'circle') { const r = Math.sqrt(Math.pow(px - x1, 2) + Math.pow(py - y1, 2)); ghostG.innerHTML = `<circle cx="${x1}" cy="${y1}" r="${r}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5" fill="none" />`; } else { ghostG.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${px}" y2="${py}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>`; } snapped = true; return; } } }); if (!snapped) { if (this.state.interactionMode === 'circle') { const r = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)); ghostG.innerHTML = `<circle cx="${x1}" cy="${y1}" r="${r}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5" fill="none" />`; } else { ghostG.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>`; } } } } if (this.drag.active) {
+                    e.preventDefault(); const dx = e.clientX - this.drag.startX; const dy = e.clientY - this.drag.startY; if (this.drag.mode === 'resize') { const scale = this.state.viewZoom; let newW = this.drag.startW; let newH = this.drag.startH; if (this.drag.dir.includes('e')) newW += (dx / scale) * 2; if (this.drag.dir.includes('s')) newH += (dy / scale) * 2; if (newW < 100) newW = 100; if (newH < 100) newH = 100; this.state.width = newW; this.state.height = newH; this.state.axisX = newW / 2; this.state.axisY = newH / 2; this.syncUI(); document.getElementById('sizePreset').value = 'custom'; this.updateRender(); } else if (this.drag.mode === 'axes') { const scale = this.state.viewZoom; let nx = this.drag.startAx + (dx / scale); let ny = this.drag.startAy + (dy / scale); if (this.state.magnetMode) { nx = Math.round(nx / this.state.baseUnit) * this.state.baseUnit; ny = Math.round(ny / this.state.baseUnit) * this.state.baseUnit; } this.state.axisX = nx; this.state.axisY = ny; this.updateRender(); }
+
+                    // --- LOGIQUE DRAG TABLEAU ---
+                    else if (this.drag.mode === 'table') {
+                        const scale = this.state.viewZoom;
+                        const idx = this.drag.idx;
+                        this.state.tables[idx].pos.x = this.drag.originX + (dx / scale);
+                        this.state.tables[idx].pos.y = this.drag.originY + (dy / scale);
+                        this.updateRender();
+                    }
+
+                } if (this.state.interactionMode === 'move') { if (e.target.closest('#canvas-wrapper') && !e.target.classList.contains('resize-handle')) { const nearVert = Math.abs(pos.x - this.state.axisX) < 15; const nearHoriz = Math.abs(pos.y - this.state.axisY) < 15; if (nearVert || nearHoriz) this.ui.wrapper.style.cursor = 'move'; else this.ui.wrapper.style.cursor = 'default'; } }
+            },
+            onMouseUp: function () { if (this.drag.active && (this.drag.mode === 'resize' || this.drag.mode === 'axes')) { this.saveState(); } this.drag.active = false; this.ui.overlay.classList.remove('visible'); this.ui.wrapper.classList.remove('no-transition'); },
+
+            // --- FONCTION TIKZ (Épaisseurs précises en 'pt' + Tableaux + COULEURS HEX 6 DIGITS) ---
             generateTikZ: function () {
                 const minU = -this.state.axisX / this.state.baseUnit;
                 const maxU = (this.state.width - this.state.axisX) / this.state.baseUnit;
-                const maxV = this.state.axisY / this.state.baseUnit; 
-                const minV = (this.state.axisY - this.state.height) / this.state.baseUnit; 
+                const maxV = this.state.axisY / this.state.baseUnit;
+                const minV = (this.state.axisY - this.state.height) / this.state.baseUnit;
 
                 const colorsUsed = new Set();
                 const getColor = (hex) => {
@@ -1494,70 +1964,65 @@
                     return cName;
                 };
 
-                // Conversion Pixel -> Point LaTeX (ajustable si besoin)
-                // On met un ratio de 0.8 pour que ce soit fidèle à l'écran
                 const getWidth = (w) => (w * 0.8).toFixed(2);
-                const fmt = (n) => n.toFixed(2); 
+                const fmt = (n) => n.toFixed(2);
 
                 let content = "";
-                
-                // 1. Grille (Utilise maintenant l'épaisseur "w" de la couche)
+
+                // 1. Grille
                 this.state.layers.forEach(l => {
-                   const step = l.m;
-                   const col = getColor(l.c);
-                   const width = getWidth(l.w); // Récupère l'épaisseur configurée
-                   
-                   // On construit le style manuellement avec line width
-                   let style = `, line width=${width}pt`;
-                   if (l.s === 'dash') style += ', dashed';
-                   if (l.s === 'dot') style += ', dotted';
-                   if (l.s === 'shortdash') style += ', dash pattern=on 2pt off 2pt'; // Custom pour courts
-                   
-                   const startX = Math.floor(minU/step)*step;
-                   const endX = Math.ceil(maxU/step)*step;
-                   const startY = Math.floor(minV/step)*step;
-                   const endY = Math.ceil(maxV/step)*step;
-                   
-                   content += `    % Grille ${l.name}\n`;
-                   content += `    \\draw[color=${col}, step=${step}${style}] (${fmt(startX)},${fmt(startY)}) grid (${fmt(endX)},${fmt(endY)});\n`;
+                    const step = l.m;
+                    const col = getColor(l.c);
+                    const width = getWidth(l.w);
+
+                    let style = `, line width=${width}pt`;
+                    if (l.s === 'dash') style += ', dashed';
+                    if (l.s === 'dot') style += ', dotted';
+                    if (l.s === 'shortdash') style += ', dash pattern=on 2pt off 2pt';
+
+                    const startX = Math.floor(minU / step) * step;
+                    const endX = Math.ceil(maxU / step) * step;
+                    const startY = Math.floor(minV / step) * step;
+                    const endY = Math.ceil(maxV / step) * step;
+
+                    content += `    % Grille ${l.name}\n`;
+                    content += `    \\draw[color=${col}, step=${step}${style}] (${fmt(startX)},${fmt(startY)}) grid (${fmt(endX)},${fmt(endY)});\n`;
                 });
 
                 // 2. Axes
-                if(this.state.showAxes) {
+                if (this.state.showAxes) {
                     content += `    % Axes\n`;
-                    // Axes fixés à 1.2pt pour être bien visibles
                     content += `    \\draw[->, line width=1.2pt] (${fmt(minU)},0) -- (${fmt(maxU)},0) node[right] {$x$};\n`;
                     content += `    \\draw[->, line width=1.2pt] (0,${fmt(minV)}) -- (0,${fmt(maxV)}) node[above] {$y$};\n`;
-                    
-                    if(this.state.showLabels) {
-                         const startX = Math.ceil(minU); const endX = Math.floor(maxU);
-                         for(let i=startX; i<=endX; i++) {
-                             if(i!==0) content += `    \\draw (${i},0.1) -- (${i},-0.1) node[below] {\\small ${i}};\n`;
-                         }
-                         const startY = Math.ceil(minV); const endY = Math.floor(maxV);
-                         for(let i=startY; i<=endY; i++) {
-                             if(i!==0) content += `    \\draw (0.1,${i}) -- (-0.1,${i}) node[left] {\\small ${i}};\n`;
-                         }
+
+                    if (this.state.showLabels) {
+                        const startX = Math.ceil(minU); const endX = Math.floor(maxU);
+                        for (let i = startX; i <= endX; i++) {
+                            if (i !== 0) content += `    \\draw (${i},0.1) -- (${i},-0.1) node[below] {\\small ${i}};\n`;
+                        }
+                        const startY = Math.ceil(minV); const endY = Math.floor(maxV);
+                        for (let i = startY; i <= endY; i++) {
+                            if (i !== 0) content += `    \\draw (0.1,${i}) -- (-0.1,${i}) node[left] {\\small ${i}};\n`;
+                        }
                     }
                 }
 
                 // 3. Objets géométriques
                 content += `    % Objets\n`;
-                
-                // Lignes
+
                 this.state.links.forEach(l => {
+                    if (l.visible === false) return; // Skip invisible
                     const p1 = this.state.points[l.from];
                     const p2 = this.state.points[l.to];
                     const col = getColor(l.color);
                     const style = l.dashed ? ', dashed' : '';
                     const arrow = l.type === 'vector' ? ', ->, >=latex' : '';
-                    // On utilise line width explicite
                     content += `    \\draw[color=${col}, line width=${getWidth(l.width)}pt${style}${arrow}] (${p1.u},${p1.v}) -- (${p2.u},${p2.v});\n`;
                 });
 
-                // Cercles
-                if(this.state.circles) {
+                if (this.state.circles) {
                     this.state.circles.forEach(c => {
+                        if (c.visible === false) return;
                         const p1 = this.state.points[c.center];
                         const p2 = this.state.points[c.edge];
                         const r = Math.sqrt(Math.pow(p2.u - p1.u, 2) + Math.pow(p2.v - p1.v, 2));
@@ -1567,471 +2032,153 @@
                     });
                 }
 
-                // Courbes (Splines)
                 this.state.curves.forEach(c => {
-                     const col = getColor(c.color);
-                     const style = c.dashed ? ', dashed' : '';
-                     let ptsStr = "";
-                     c.pts.forEach(pid => {
-                         const p = this.state.points[pid];
-                         ptsStr += `(${p.u},${p.v}) `;
-                     });
-                     content += `    \\draw[color=${col}, line width=${getWidth(c.width)}pt${style}] plot [smooth, tension=0.7] coordinates { ${ptsStr} };\n`;
+                    if (c.visible === false) return;
+                    const col = getColor(c.color);
+                    const style = c.dashed ? ', dashed' : '';
+                    let ptsStr = "";
+                    c.pts.forEach(pid => {
+                        const p = this.state.points[pid];
+                        ptsStr += `(${p.u},${p.v}) `;
+                    });
+                    content += `    \\draw[color=${col}, line width=${getWidth(c.width)}pt${style}] plot [smooth, tension=0.7] coordinates { ${ptsStr} };\n`;
                 });
 
-                // Fonctions
                 this.state.functions.forEach(f => {
+                    if (f.visible === false) return;
                     const col = getColor(f.color);
                     let expr = f.expr.replace(/\*\*/g, '^');
                     expr = expr.replace(/(^|[^a-zA-Z\\])x([^a-zA-Z]|$)/g, '$1\\x$2');
                     expr = expr.replace(/sin\(\\x\)/g, 'sin(\\x r)')
-                               .replace(/cos\(\\x\)/g, 'cos(\\x r)')
-                               .replace(/tan\(\\x\)/g, 'tan(\\x r)');
+                        .replace(/cos\(\\x\)/g, 'cos(\\x r)')
+                        .replace(/tan\(\\x\)/g, 'tan(\\x r)');
 
                     content += `    \\draw[color=${col}, line width=${getWidth(f.width)}pt, samples=100, smooth, domain=${fmt(minU)}:${fmt(maxU)}] plot (\\x, {${expr}});\n`;
                 });
 
-                // Points (Croix avec épaisseur explicite)
                 this.state.points.forEach(p => {
+                    if (p.visible === false) return;
                     const col = getColor(p.color);
-                    const s = 0.15; 
+                    const s = 0.15;
                     const x = p.u; const y = p.v;
                     const x1 = fmt(x - s); const x2 = fmt(x + s);
                     const y1 = fmt(y - s); const y2 = fmt(y + s);
-                    
+
                     content += `    % Point ${p.label}\n`;
-                    // line width=1.2pt pour des croix bien visibles
-                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y1}) -- (${x2},${y2});\n`; 
-                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y2}) -- (${x2},${y1});\n`; 
+                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y1}) -- (${x2},${y2});\n`;
+                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y2}) -- (${x2},${y1});\n`;
                     content += `    \\node[color=${col}] at (${fmt(x + 0.2)},${fmt(y + 0.2)}) {${p.label}};\n`;
                 });
 
-                // Textes
-                if(this.state.texts) {
+                if (this.state.texts) {
                     this.state.texts.forEach(t => {
+                        if (t.visible === false) return;
                         const col = getColor(t.color);
                         const safeText = t.content.replace(/_/g, '\\_').replace(/%/g, '\\%');
                         content += `    \\node[color=${col}, anchor=center] at (${t.u},${t.v}) {${safeText}};\n`;
                     });
                 }
 
+                if (this.state.tables) {
+                    content += `    % Tableaux de variation (Dessin manuel)\n`;
+                    this.state.tables.forEach(t => {
+                        if (t.visible === false) return;
+                        const tx = (t.pos.x - this.state.axisX) / this.state.baseUnit;
+                        const ty = (this.state.axisY - t.pos.y) / this.state.baseUnit;
+                        const hasPrime = t.showFPrime !== false; // Default true
+
+                        const rowH = 0.8;
+                        const colW = 1.5;
+                        const totalW = (t.x.length * 2 - 1) * colW;
+                        const totalRows = hasPrime ? 3 : 2;
+
+                        content += `    \\draw (${fmt(tx)},${fmt(ty)}) rectangle (${fmt(tx + totalW)},${fmt(ty - rowH * totalRows)});\n`;
+                        content += `    \\draw (${fmt(tx)},${fmt(ty - rowH)}) -- (${fmt(tx + totalW)},${fmt(ty - rowH)});\n`;
+
+                        if (hasPrime) {
+                            content += `    \\draw (${fmt(tx)},${fmt(ty - rowH * 2)}) -- (${fmt(tx + totalW)},${fmt(ty - rowH * 2)});\n`;
+                        }
+
+                        content += `    \\draw (${fmt(tx + colW)},${fmt(ty)}) -- (${fmt(tx + colW)},${fmt(ty - rowH * totalRows)});\n`;
+
+                        content += `    \\node at (${fmt(tx + colW / 2)},${fmt(ty - rowH / 2)}) {$x$};\n`;
+
+                        if (hasPrime) {
+                            content += `    \\node at (${fmt(tx + colW / 2)},${fmt(ty - rowH * 1.5)}) {$f'(x)$};\n`;
+                            content += `    \\node at (${fmt(tx + colW / 2)},${fmt(ty - rowH * 2.5)}) {$f(x)$};\n`;
+                        } else {
+                            content += `    \\node at (${fmt(tx + colW / 2)},${fmt(ty - rowH * 1.5)}) {$f(x)$};\n`;
+                        }
+
+                        // Dessin des valeurs dans le tableau TikZ
+                        let curX = tx + colW; // On commence après l'en-tête
+
+                        t.x.forEach((val, idx) => {
+                            // Valeur X (toujours au centre de la case)
+                            content += `    \\node at (${fmt(curX + colW / 2)},${fmt(ty - rowH / 2)}) {${val}};\n`;
+
+                            // Ligne pointillée verticale sous X (sauf si c'est la dernière valeur et pas un tableau infini)
+                            // En général on veut pointillé jusqu'en bas
+                            content += `    \\draw[dashed] (${fmt(curX + colW / 2)},${fmt(ty - rowH)}) -- (${fmt(curX + colW / 2)},${fmt(ty - rowH * totalRows)});\n`;
+
+                            // f'(x)
+                            if (hasPrime) {
+                                const fprimeVal = t.fprime[idx].val;
+                                if (fprimeVal && fprimeVal !== "") {
+                                    // Si c'est 0, on met un 0
+                                    if (fprimeVal === '0') content += `    \\node at (${fmt(curX + colW / 2)},${fmt(ty - rowH * 1.5)}) {0};\n`;
+                                    // Si c'est |, double barre pour valeur interdite
+                                    if (fprimeVal === '|') content += `    \\draw[double] (${fmt(curX + colW / 2)},${fmt(ty - rowH)}) -- (${fmt(curX + colW / 2)},${fmt(ty - rowH * totalRows)});\n`;
+                                    if (fprimeVal === '||') content += `    \\draw[double] (${fmt(curX + colW / 2)},${fmt(ty - rowH)}) -- (${fmt(curX + colW / 2)},${fmt(ty - rowH * totalRows)});\n`;
+                                }
+                            }
+
+                            // f(x) valeurs aux bornes
+                            const fVal = t.f[idx].val;
+                            if (fVal && fVal !== "") {
+                                const fY = hasPrime ? ty - rowH * 2.5 : ty - rowH * 1.5;
+                                content += `    \\node at (${fmt(curX + colW / 2)},${fmt(fY)}) {${fVal}};\n`;
+                            }
+
+                            // Intervalle suivant (Signes et Flèches)
+                            if (idx < t.x.length - 1) {
+                                curX += colW; // On avance dans la case intervalle
+
+                                if (hasPrime) {
+                                    const sign = t.fprime[idx].int;
+                                    if (sign) content += `    \\node at (${fmt(curX + colW / 2)},${fmt(ty - rowH * 1.5)}) {${sign}};\n`;
+                                }
+
+                                const arr = t.f[idx].arrow;
+                                if (arr) {
+                                    const fYTop = hasPrime ? ty - rowH * 2 : ty - rowH;
+                                    const fYBot = hasPrime ? ty - rowH * 3 : ty - rowH * 2;
+                                    const arrowX1 = curX + 0.2;
+                                    const arrowX2 = curX + colW - 0.2;
+
+                                    if (arr === 'up') {
+                                        content += `    \\draw[->] (${fmt(arrowX1)},${fmt(fYBot + 0.2)}) -- (${fmt(arrowX2)},${fmt(fYTop - 0.2)});\n`;
+                                    } else {
+                                        content += `    \\draw[->] (${fmt(arrowX1)},${fmt(fYTop - 0.2)}) -- (${fmt(arrowX2)},${fmt(fYBot + 0.2)});\n`;
+                                    }
+                                }
+                                curX += colW; // On avance pour la prochaine valeur
+                            }
+                        });
+                    });
+                }
+
                 let head = `\\begin{tikzpicture}[line cap=round, line join=round]\n`;
                 colorsUsed.forEach(hex => {
-                     const cName = "c" + hex.replace('#', '');
-                     let cleanHex = hex.replace('#', '');
-                     if(cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c+c).join('');
-                     head += `    \\definecolor{${cName}}{HTML}{${cleanHex.toUpperCase()}}\n`;
+                    const cName = "c" + hex.replace('#', '');
+                    let cleanHex = hex.replace('#', '');
+                    if (cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c + c).join('');
+                    head += `    \\definecolor{${cName}}{HTML}{${cleanHex.toUpperCase()}}\n`;
                 });
-                
+
                 head += `    \\clip (${fmt(minU)},${fmt(minV)}) rectangle (${fmt(maxU)},${fmt(maxV)});\n`;
 
                 return head + content + `\\end{tikzpicture}`;
-            },
-            showToast: function (msg) {
-                const t = document.getElementById('toast');
-                t.textContent = msg || "Opération effectuée";
-                t.classList.add('show');
-                setTimeout(() => t.classList.remove('show'), 3000);
-            },
-
-            showCtxMenu: function (e, type, index) {
-                e.preventDefault(); e.stopPropagation();
-                this.state.activeContext = { type, index };
-                const menu = this.ui.ctxMenu;
-                if (type === 'point') {
-                    const p = this.state.points[index];
-                    document.getElementById('ctxTitle').innerText = "Modifier Point";
-                    document.getElementById('ctxNameRow').style.display = 'block'; document.getElementById('ctxName').value = p.label;
-                    document.getElementById('ctxShowCoordsRow').style.display = 'block'; document.getElementById('ctxShowCoords').checked = p.showCoords || false;
-                    document.getElementById('ctxColor').value = p.color;
-                } else if(type === 'text') {
-                    const t = this.state.texts[index];
-                    document.getElementById('ctxTitle').innerText = "Modifier Texte";
-                    document.getElementById('ctxNameRow').style.display = 'block'; document.getElementById('ctxName').value = t.content;
-                    document.getElementById('ctxShowCoordsRow').style.display = 'none';
-                    document.getElementById('ctxColor').value = t.color;
-                } else {
-                    let l;
-                    if (type === 'link') l = this.state.links[index];
-                    else if (type === 'curve') l = this.state.curves[index];
-                    else if (type === 'circle') l = this.state.circles[index];
-                    else if (type === 'function') l = this.state.functions[index];
-
-                    document.getElementById('ctxTitle').innerText = "Modifier";
-                    document.getElementById('ctxNameRow').style.display = 'none';
-                    document.getElementById('ctxShowCoordsRow').style.display = 'none';
-                    document.getElementById('ctxColor').value = l.color;
-                }
-                const parentRect = document.getElementById('preview-container').getBoundingClientRect();
-                const relX = (e.clientX - parentRect.left) / this.state.viewZoom;
-                const relY = (e.clientY - parentRect.top) / this.state.viewZoom;
-                menu.style.display = 'block';
-                menu.style.left = relX + 'px'; menu.style.top = relY + 'px';
-            },
-            hideCtxMenu: function () { this.ui.ctxMenu.style.display = 'none'; },
-            
-            updateFromCtx: function (prop, val) {
-                if (!this.state.activeContext) return;
-                const { type, index } = this.state.activeContext;
-                if (type === 'point') this.state.points[index][prop] = val;
-                else if (type === 'text') {
-                    if(prop === 'label') this.state.texts[index].content = val;
-                    if(prop === 'color') this.state.texts[index].color = val;
-                }
-                else if (type === 'link') { if (prop === 'color') this.state.links[index].color = val; }
-                else if (type === 'curve') { if (prop === 'color') this.state.curves[index].color = val; }
-                else if (type === 'circle') { if (prop === 'color') this.state.circles[index].color = val; }
-                else if (type === 'function') { if (prop === 'color') this.state.functions[index].color = val; }
-                this.updateRender();
-            },
-            deleteActiveItem: function () {
-                if (!this.state.activeContext) return;
-                this.deleteItem(this.state.activeContext.type, this.state.activeContext.index);
-                this.state.activeContext = null; this.hideCtxMenu();
-            },
-
-            getAvailableLabel: function () {
-                const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-                let i = 0;
-                while (true) {
-                    const charIndex = i % 26; const cycle = Math.floor(i / 26);
-                    const suffix = "'".repeat(cycle); const candidate = alphabet[charIndex] + suffix;
-                    if (!this.state.points.some(p => p.label === candidate)) return candidate;
-                    i++;
-                }
-            },
-            getMousePos: function (e) {
-                const rect = this.ui.wrapper.getBoundingClientRect();
-                return {
-                    x: (e.clientX - rect.left) / this.state.viewZoom,
-                    y: (e.clientY - rect.top) / this.state.viewZoom
-                };
-            },
-            addPoint: function (e) {
-                this.saveState();
-                const pos = this.getMousePos(e);
-                let lu = (pos.x - this.state.axisX) / this.state.baseUnit;
-                let lv = (this.state.axisY - pos.y) / this.state.baseUnit;
-                if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; }
-                this.state.points.push({ u: lu, v: lv, label: this.getAvailableLabel(), color: "#e74c3c", showCoords: false });
-                this.updateRender();
-                return this.state.points.length - 1; // Return index
-            },
-            
-            // --- NOUVEAU SYSTÈME DE TEXTE ---
-            addText: function(e) {
-                const pos = this.getMousePos(e);
-                let lu = (pos.x - this.state.axisX) / this.state.baseUnit;
-                let lv = (this.state.axisY - pos.y) / this.state.baseUnit;
-                
-                this.state.tempTextPos = { u: lu, v: lv };
-
-                // Afficher l'input
-                this.ui.floatingInput.style.display = 'block';
-                this.ui.floatingInput.style.left = e.clientX + 'px';
-                this.ui.floatingInput.style.top = e.clientY + 'px';
-                this.ui.floatingInput.value = '';
-                this.ui.floatingInput.focus();
-            },
-            confirmText: function() {
-                const content = this.ui.floatingInput.value.trim();
-                if(content && this.state.tempTextPos) {
-                    this.saveState();
-                    if(!this.state.texts) this.state.texts = [];
-                    this.state.texts.push({
-                        u: this.state.tempTextPos.u,
-                        v: this.state.tempTextPos.v,
-                        content: content,
-                        color: "#333"
-                    });
-                    this.updateRender();
-                    this.setMode('move');
-                }
-                this.cancelText();
-            },
-            cancelText: function() {
-                this.ui.floatingInput.style.display = 'none';
-                this.ui.floatingInput.value = '';
-                this.state.tempTextPos = null;
-            },
-            
-            recenterAxes: function () { this.saveState(); this.state.axisX = this.state.width / 2; this.state.axisY = this.state.height / 2; this.updateRender(); },
-
-            getSmoothPath: function (ptIndices) {
-                if (ptIndices.length < 2) return "";
-                const coords = ptIndices.map(i => {
-                    const p = this.state.points[i];
-                    return { x: this.state.axisX + p.u * this.state.baseUnit, y: this.state.axisY - p.v * this.state.baseUnit };
-                });
-                if (coords.length === 2) return `M ${coords[0].x} ${coords[0].y} L ${coords[1].x} ${coords[1].y}`;
-                let d = `M ${coords[0].x} ${coords[0].y}`;
-                for (let i = 0; i < coords.length - 1; i++) {
-                    const p0 = coords[i === 0 ? 0 : i - 1]; const p1 = coords[i]; const p2 = coords[i + 1]; const p3 = coords[i + 2] || p2;
-                    const cp1x = p1.x + (p2.x - p0.x) / 6; const cp1y = p1.y + (p2.y - p0.y) / 6;
-                    const cp2x = p2.x - (p3.x - p1.x) / 6; const cp2y = p2.y - (p3.y - p1.y) / 6;
-                    d += ` C ${cp1x} ${cp1y}, ${cp2x} ${cp2y}, ${p2.x} ${p2.y}`;
-                }
-                return d;
-            },
-
-            renderGhost: function (pos) {
-                if (this.state.interactionMode !== 'point') return "";
-                let lu = (pos.x - this.state.axisX) / this.state.baseUnit;
-                let lv = (this.state.axisY - pos.y) / this.state.baseUnit;
-                if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; }
-                const px = this.state.axisX + lu * this.state.baseUnit;
-                const py = this.state.axisY - lv * this.state.baseUnit;
-                const col = "#e74c3c";
-                let svg = `<g style="pointer-events:none;">`;
-                svg += `<line x1="${px}" y1="${py}" x2="${px}" y2="${this.state.axisY}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`;
-                svg += `<line x1="${px}" y1="${py}" x2="${this.state.axisX}" y2="${py}" stroke="${col}" stroke-width="1" stroke-dasharray="4,4" opacity="0.6"/>`;
-                const s = 5;
-                svg += `<path d="M ${px - s} ${py - s} L ${px + s} ${py + s} M ${px - s} ${py + s} L ${px + s} ${py - s}" stroke="${col}" stroke-width="2"/>`;
-                svg += `<text x="${px + 8}" y="${py - 8}" font-family="Arial" font-size="12" fill="${col}" font-weight="bold">(${lu}; ${lv})</text></g>`;
-                return svg;
-            },
-
-            setMode: function (mode) {
-                if (this.state.activeCurve.length > 0) this.finishCurve();
-                this.state.interactionMode = mode;
-                this.state.tempLinkStart = null;
-                document.querySelectorAll('.tool-btn').forEach(b => b.classList.remove('active'));
-
-                const instructions = {
-                    'move': "Déplacez les axes ou redimensionnez.",
-                    'point': "Cliquez pour placer un point.",
-                    'link': "Clic point départ -> Clic point arrivée.",
-                    'curve': "Clics successifs. 'Entrée' pour finir.",
-                    'circle': "Clic centre -> Clic point du bord.",
-                    'text': "Cliquez pour écrire.",
-                    'function': "Remplissez f(x) à gauche."
-                };
-                if (instructions[mode]) this.showToast(instructions[mode]);
-
-                const mapBtn = { 'move':'btnModeMove', 'point':'btnModePoint', 'link':'btnModeLink', 'curve':'btnModeCurve', 'circle':'btnModeCircle', 'text':'btnModeText', 'function':'btnModeFunction' };
-                if(mapBtn[mode]) document.getElementById(mapBtn[mode]).classList.add('active');
-
-                this.ui.wrapper.style.cursor = (mode === 'move') ? 'default' : (mode === 'point' ? 'crosshair' : 'pointer');
-                
-                document.getElementById('tool-settings-panel').style.display = (mode === 'link' || mode === 'curve' || mode === 'circle') ? 'block' : 'none';
-                document.getElementById('function-settings-panel').style.display = (mode === 'function') ? 'block' : 'none';
-                this.updateRender();
-            },
-
-            zoomView: function (delta) {
-                this.state.viewZoom += delta;
-                if (this.state.viewZoom < 0.2) this.state.viewZoom = 0.2;
-                if (this.state.viewZoom > 5) this.state.viewZoom = 5;
-                this.applyZoomCSS();
-            },
-            applyZoomCSS: function () {
-                this.ui.wrapper.style.transform = `scale(${this.state.viewZoom})`;
-            },
-            zoom: function (delta) { this.zoomView(delta > 0 ? 0.1 : -0.1); },
-
-            applySizePreset: function () {
-                this.saveState();
-                const val = document.getElementById('sizePreset').value;
-                if (val === 'custom') return;
-                const size = this.presets.sizes[val];
-                this.setSize(size.w, size.h);
-            },
-            setSize: function (w, h) {
-                this.state.width = w; this.state.height = h;
-                this.state.axisX = w / 2; this.state.axisY = h / 2;
-                this.syncUI(); this.updateRender();
-            },
-            syncUI: function () {
-                this.ui.inputs.w.value = Math.round(this.state.width);
-                this.ui.inputs.h.value = Math.round(this.state.height);
-                this.ui.wrapper.style.width = this.state.width + 'px';
-                this.ui.wrapper.style.height = this.state.height + 'px';
-            },
-
-            drag: { active: false, startX: 0, startY: 0, startW: 0, startH: 0, startAx: 0, startAy: 0 },
-            startResize: function (e, dir) { e.stopPropagation(); this.drag = { active: true, mode: 'resize', dir: dir, startX: e.clientX, startY: e.clientY, startW: this.state.width, startH: this.state.height }; this.ui.wrapper.classList.add('no-transition'); this.ui.overlay.classList.add('visible'); },
-            startAxesDrag: function (e) { this.drag = { active: true, mode: 'axes', startX: e.clientX, startY: e.clientY, startAx: this.state.axisX, startAy: this.state.axisY }; this.ui.wrapper.style.cursor = 'move'; },
-
-            onMouseMove: function (e) {
-                const pos = this.getMousePos(e);
-
-                if (!this.drag.active && this.state.interactionMode === 'point') {
-                    let ghostG = document.getElementById('ghost-layer');
-                    if (!ghostG) { if (this.ui.wrapper.querySelector('svg')) this.updateRender(); return; }
-                    ghostG.innerHTML = this.renderGhost(pos);
-                }
-
-                // Ghost Link / Circle
-                if (!this.drag.active && ((this.state.interactionMode === 'link' && this.state.tempLinkStart !== null) || (this.state.interactionMode === 'circle' && this.state.tempLinkStart !== null) || (this.state.interactionMode === 'curve' && this.state.activeCurve.length > 0))) {
-                    let ghostG = document.getElementById('ghost-layer');
-                    if (ghostG) {
-                        const startIdx = (this.state.interactionMode === 'link' || this.state.interactionMode === 'circle') ? this.state.tempLinkStart : this.state.activeCurve[this.state.activeCurve.length - 1];
-                        const p1 = this.state.points[startIdx];
-                        const x1 = this.state.axisX + p1.u * this.state.baseUnit;
-                        const y1 = this.state.axisY - p1.v * this.state.baseUnit;
-                        let lu = (pos.x - this.state.axisX) / this.state.baseUnit;
-                        let lv = (this.state.axisY - pos.y) / this.state.baseUnit;
-                        if (this.state.magnetMode) { lu = Math.round(lu * 2) / 2; lv = Math.round(lv * 2) / 2; }
-                        const x2 = this.state.axisX + lu * this.state.baseUnit;
-                        const y2 = this.state.axisY - lv * this.state.baseUnit;
-
-                        let snapped = false;
-                        this.state.points.forEach((p, i) => {
-                            if (i !== startIdx) {
-                                const px = this.state.axisX + p.u * this.state.baseUnit;
-                                const py = this.state.axisY - p.v * this.state.baseUnit;
-                                if (Math.abs(pos.x - px) < 15 && Math.abs(pos.y - py) < 15) {
-                                    if(this.state.interactionMode === 'circle') {
-                                           const r = Math.sqrt(Math.pow(px-x1, 2) + Math.pow(py-y1, 2));
-                                           ghostG.innerHTML = `<circle cx="${x1}" cy="${y1}" r="${r}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5" fill="none" />`;
-                                    } else {
-                                        ghostG.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${px}" y2="${py}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>`;
-                                    }
-                                    snapped = true;
-                                    return;
-                                }
-                            }
-                        });
-                        if (!snapped) {
-                            if(this.state.interactionMode === 'circle') {
-                                const r = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
-                                ghostG.innerHTML = `<circle cx="${x1}" cy="${y1}" r="${r}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5" fill="none" />`;
-                            } else {
-                                ghostG.innerHTML = `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#27ae60" stroke-width="2" stroke-dasharray="5,5"/>`;
-                            }
-                        }
-                    }
-                }
-
-                if (this.drag.active) {
-                    e.preventDefault();
-                    const dx = e.clientX - this.drag.startX;
-                    const dy = e.clientY - this.drag.startY;
-
-                    if (this.drag.mode === 'resize') {
-                        const scale = this.state.viewZoom;
-                        let newW = this.drag.startW; let newH = this.drag.startH;
-                        if (this.drag.dir.includes('e')) newW += (dx / scale) * 2;
-                        if (this.drag.dir.includes('s')) newH += (dy / scale) * 2;
-                        if (newW < 100) newW = 100; if (newH < 100) newH = 100;
-                        this.state.width = newW; this.state.height = newH;
-                        this.state.axisX = newW / 2; this.state.axisY = newH / 2;
-                        this.syncUI(); document.getElementById('sizePreset').value = 'custom';
-                        this.updateRender();
-                    } else if (this.drag.mode === 'axes') {
-                        const scale = this.state.viewZoom;
-                        let nx = this.drag.startAx + (dx / scale); let ny = this.drag.startAy + (dy / scale);
-                        if (this.state.magnetMode) { nx = Math.round(nx / this.state.baseUnit) * this.state.baseUnit; ny = Math.round(ny / this.state.baseUnit) * this.state.baseUnit; }
-                        this.state.axisX = nx; this.state.axisY = ny;
-                        this.updateRender();
-                    }
-                }
-
-                if (this.state.interactionMode === 'move') {
-                    if (e.target.closest('#canvas-wrapper') && !e.target.classList.contains('resize-handle')) {
-                        const nearVert = Math.abs(pos.x - this.state.axisX) < 15;
-                        const nearHoriz = Math.abs(pos.y - this.state.axisY) < 15;
-                        if (nearVert || nearHoriz) this.ui.wrapper.style.cursor = 'move';
-                        else this.ui.wrapper.style.cursor = 'default';
-                    }
-                }
-            },
-
-            onMouseUp: function () {
-                if(this.drag.active && (this.drag.mode === 'resize' || this.drag.mode === 'axes')) {
-                    this.saveState();
-                }
-                this.drag.active = false;
-                this.ui.overlay.classList.remove('visible');
-                this.ui.wrapper.classList.remove('no-transition');
-            },
-
-            updateLabelDist: function (val) { this.state.labelDistance = parseInt(val); this.updateRender(); },
-
-            applyTheme: function (themeName) {
-                const type = document.getElementById('headerGridPreset').value;
-                let preset;
-                if (this.presets.grid[type]) {
-                    preset = this.presets.themes[themeName][type] || this.presets.themes[themeName]['simple'];
-                } else {
-                    preset = this.presets.themes[themeName]['simple'];
-                }
-
-                this.state.layers.forEach((layer, index) => {
-                    if (preset && preset.length) layer.c = preset[index % preset.length];
-                });
-                this.generateLayerUI();
-                this.updateRender();
-            },
-
-            updateLayerConfig: function (index, prop, value) {
-                this.saveState();
-                this.state.layers[index][prop] = value;
-                this.updateRender();
-            },
-
-            updateLayerDir: function (index, dir) {
-                this.saveState();
-                this.state.layers[index]['dir'] = dir;
-                this.updateRender();
-            },
-
-            generateLayerUI: function () {
-                const isEdit = this.state.isGridEditMode;
-                const containerId = isEdit ? 'layers-container-edit' : 'layers-container-normal';
-                const container = document.getElementById(containerId);
-
-                if (!container) return;
-
-                container.innerHTML = '';
-
-                this.state.layers.forEach((layer, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'layer-item';
-                    div.style.borderLeftColor = layer.c;
-
-                    let headerHtml = '';
-                    if (isEdit) {
-                        headerHtml = `
-                        <div class="layer-header" style="gap:5px;">
-                            <input type="text" class="layer-name-input" value="${layer.name}" oninput="app.updateLayerConfig(${index}, 'name', this.value)">
-                            <button class="obj-del" style="color:var(--danger);" onclick="app.removeLayer(${index})" title="Supprimer">🗑️</button>
-                        </div>`;
-                    } else {
-                        headerHtml = `<div class="layer-header"><span>${layer.name}</span></div>`;
-                    }
-
-                    let extraEditHtml = '';
-                    if (isEdit) {
-                        extraEditHtml = `
-                        <div class="input-group">
-                            <label>Répétition (u)</label>
-                            <input type="number" step="0.1" value="${layer.m}" oninput="app.updateLayerConfig(${index}, 'm', parseFloat(this.value))">
-                        </div>`;
-                    }
-
-                    div.innerHTML = headerHtml + `
-                        <div class="control-row">
-                            <div class="input-group"><label>Couleur</label><input type="color" value="${layer.c}" oninput="app.updateLayerConfig(${index}, 'c', this.value)"></div>
-                            <div class="input-group"><label>Épaisseur</label><input type="number" value="${layer.w}" step="0.1" oninput="app.updateLayerConfig(${index}, 'w', parseFloat(this.value))"></div>
-                        </div>
-                        ${extraEditHtml}
-                        <div class="control-row">
-                            <select onchange="app.updateLayerConfig(${index}, 's', this.value)" style="font-size:0.8rem; padding:4px;">
-                                <option value="solid" ${layer.s === 'solid' ? 'selected' : ''}>Continu</option>
-                                <option value="dash" ${layer.s === 'dash' ? 'selected' : ''}>Tirets</option>
-                                <option value="shortdash" ${layer.s === 'shortdash' ? 'selected' : ''}>Courts</option>
-                                <option value="dot" ${layer.s === 'dot' ? 'selected' : ''}>Points</option>
-                            </select>
-                            <select onchange="app.updateLayerDir(${index}, this.value)" style="font-size:0.8rem; padding:4px;">
-                                <option value="both" ${(!layer.dir || layer.dir === 'both') ? 'selected' : ''}>Quadrillage (XY)</option>
-                                <option value="h" ${layer.dir === 'h' ? 'selected' : ''}>Horizontal (H)</option>
-                                <option value="v" ${layer.dir === 'v' ? 'selected' : ''}>Vertical (V)</option>
-                            </select>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
             },
 
             updateRender: function () {
@@ -2074,39 +2221,56 @@
                     const g = document.createElementNS(ns, "g");
                     g.setAttribute("stroke", l.c); g.setAttribute("stroke-width", l.w);
                     if (this.lineStyles[l.s] !== "none") g.setAttribute("stroke-dasharray", this.lineStyles[l.s]);
-
-                    let d = "";
-                    const dir = l.dir || 'both';
-                    if (dir !== 'h') {
-                        const offX = this.state.axisX % step;
-                        for (let x = offX; x <= this.state.width; x += step) d += `M ${Math.round(x)} 0 V ${this.state.height} `;
-                    }
-                    if (dir !== 'v') {
-                        const offY = this.state.axisY % step;
-                        for (let y = offY; y <= this.state.height; y += step) d += `M 0 ${Math.round(y)} H ${this.state.width} `;
-                    }
+                    let d = ""; const dir = l.dir || 'both';
+                    if (dir !== 'h') { const offX = this.state.axisX % step; for (let x = offX; x <= this.state.width; x += step) d += `M ${Math.round(x)} 0 V ${this.state.height} `; }
+                    if (dir !== 'v') { const offY = this.state.axisY % step; for (let y = offY; y <= this.state.height; y += step) d += `M 0 ${Math.round(y)} H ${this.state.width} `; }
                     const p = document.createElementNS(ns, "path"); p.setAttribute("d", d); p.setAttribute("fill", "none");
                     g.appendChild(p); mainGroup.appendChild(g);
                 });
 
-                // Axes
                 if (this.state.showAxes) {
-                    const ax = Math.round(this.state.axisX); const ay = Math.round(this.state.axisY);
+                    const ax = Math.round(this.state.axisX);
+                    const ay = Math.round(this.state.axisY);
+                    const m = this.state.margin; // On récupère la marge actuelle
+
                     const axG = document.createElementNS(ns, "g");
                     axG.setAttribute("stroke", "#000"); axG.setAttribute("stroke-width", "1.5");
-                    let d = `M 0 ${ay} H ${this.state.width} M ${ax} 0 V ${this.state.height}`;
+
+                    // --- CORRECTION: Les axes s'arrêtent aux marges ---
+
+                    // Axe X : De MargeGauche à Largeur-MargeDroite
+                    const xAxis = document.createElementNS(ns, "line");
+                    xAxis.setAttribute("x1", m); xAxis.setAttribute("y1", ay);
+                    xAxis.setAttribute("x2", this.state.width - m); xAxis.setAttribute("y2", ay);
+                    xAxis.setAttribute("stroke", "#000"); xAxis.setAttribute("stroke-width", "1.5");
+                    xAxis.setAttribute("marker-end", "url(#arrowhead)");
+                    axG.appendChild(xAxis);
+
+                    // Axe Y : De Hauteur-MargeBas à MargeHaut
+                    // (Attention: en SVG, Y=0 est en haut, donc on va de Height-m vers m)
+                    const yAxis = document.createElementNS(ns, "line");
+                    yAxis.setAttribute("x1", ax); yAxis.setAttribute("y1", this.state.height - m);
+                    yAxis.setAttribute("x2", ax); yAxis.setAttribute("y2", m);
+                    yAxis.setAttribute("stroke", "#000"); yAxis.setAttribute("stroke-width", "1.5");
+                    yAxis.setAttribute("marker-end", "url(#arrowhead)");
+                    axG.appendChild(yAxis);
+
                     if (this.state.showTicks) {
                         let l = this.state.layers.find(l => l.m === 1) || this.state.layers[this.state.layers.length - 1];
                         if (l) {
                             const step = l.m * this.state.baseUnit; const t = 4;
                             const offX = this.state.axisX % step;
-                            for (let x = offX; x <= this.state.width; x += step) if (Math.abs(x - ax) > 2) d += `M ${Math.round(x)} ${ay - t} V ${ay + t} `;
+                            let ticksPath = "";
+                            for (let x = offX; x <= this.state.width; x += step) if (Math.abs(x - ax) > 2) ticksPath += `M ${Math.round(x)} ${ay - t} V ${ay + t} `;
                             const offY = this.state.axisY % step;
-                            for (let y = offY; y <= this.state.height; y += step) if (Math.abs(y - ay) > 2) d += `M ${ax - t} ${Math.round(y)} H ${ax + t} `;
+                            for (let y = offY; y <= this.state.height; y += step) if (Math.abs(y - ay) > 2) ticksPath += `M ${ax - t} ${Math.round(y)} H ${ax + t} `;
+
+                            const p = document.createElementNS(ns, "path"); p.setAttribute("d", ticksPath); p.setAttribute("fill", "none");
+                            axG.appendChild(p);
                         }
                     }
-                    const p = document.createElementNS(ns, "path"); p.setAttribute("d", d); p.setAttribute("fill", "none");
-                    axG.appendChild(p); mainGroup.appendChild(axG);
+
+                    mainGroup.appendChild(axG);
 
                     if (this.state.showLabels) {
                         const lbG = document.createElementNS(ns, "g");
@@ -2114,24 +2278,12 @@
                         if (l) {
                             const step = l.m * this.state.baseUnit; const dist = this.state.labelDistance;
                             const mkLbl = (val, x, y) => {
-                                const g = document.createElementNS(ns, "g");
-                                g.setAttribute("transform", `translate(${x}, ${y})`);
-                                if (this.state.labelStyle === 'badge') {
-                                    const w = 12 + String(val).length * 8;
-                                    const r = document.createElementNS(ns, "rect");
-                                    r.setAttribute("x", -w / 2); r.setAttribute("y", -10); r.setAttribute("width", w); r.setAttribute("height", 20);
-                                    r.setAttribute("rx", 4); r.setAttribute("fill", "white"); r.setAttribute("fill-opacity", "0.85");
-                                    g.appendChild(r);
-                                }
-                                const txt = document.createElementNS(ns, "text");
-                                txt.textContent = val; txt.setAttribute("text-anchor", "middle"); txt.setAttribute("dominant-baseline", "middle");
-                                txt.setAttribute("font-family", this.state.labelFont); txt.setAttribute("font-size", this.state.labelFontSize);
-                                g.appendChild(txt); lbG.appendChild(g);
+                                const g = document.createElementNS(ns, "g"); g.setAttribute("transform", `translate(${x}, ${y})`);
+                                if (this.state.labelStyle === 'badge') { const w = 12 + String(val).length * 8; const r = document.createElementNS(ns, "rect"); r.setAttribute("x", -w / 2); r.setAttribute("y", -10); r.setAttribute("width", w); r.setAttribute("height", 20); r.setAttribute("rx", 4); r.setAttribute("fill", "white"); r.setAttribute("fill-opacity", "0.85"); g.appendChild(r); }
+                                const txt = document.createElementNS(ns, "text"); txt.textContent = val; txt.setAttribute("text-anchor", "middle"); txt.setAttribute("dominant-baseline", "middle"); txt.setAttribute("font-family", this.state.labelFont); txt.setAttribute("font-size", this.state.labelFontSize); g.appendChild(txt); lbG.appendChild(g);
                             };
-                            const offX = this.state.axisX % step;
-                            for (let x = offX; x <= this.state.width; x += step) { const v = Math.round((x - ax) / this.state.baseUnit); if (v !== 0) mkLbl(v, x, ay + dist); }
-                            const offY = this.state.axisY % step;
-                            for (let y = offY; y <= this.state.height; y += step) { const v = Math.round((ay - y) / this.state.baseUnit); if (v !== 0) mkLbl(v, ax - dist, y); }
+                            const offX = this.state.axisX % step; for (let x = offX; x <= this.state.width; x += step) { const v = Math.round((x - ax) / this.state.baseUnit); if (v !== 0) mkLbl(v, x, ay + dist); }
+                            const offY = this.state.axisY % step; for (let y = offY; y <= this.state.height; y += step) { const v = Math.round((ay - y) / this.state.baseUnit); if (v !== 0) mkLbl(v, ax - dist, y); }
                         }
                         mainGroup.appendChild(lbG);
                     }
@@ -2140,175 +2292,199 @@
                 // Links
                 const linkG = document.createElementNS(ns, "g");
                 this.state.links.forEach((lnk, i) => {
-                    const p1 = this.state.points[lnk.from]; const p2 = this.state.points[lnk.to];
-                    if (!p1 || !p2) return;
-                    const x1 = this.state.axisX + p1.u * this.state.baseUnit; const y1 = this.state.axisY - p1.v * this.state.baseUnit;
-                    const x2 = this.state.axisX + p2.u * this.state.baseUnit; const y2 = this.state.axisY - p2.v * this.state.baseUnit;
-
-                    const lg = document.createElementNS(ns, "g");
-                    lg.style.cursor = "pointer";
-                    const hb = document.createElementNS(ns, "line");
-                    hb.setAttribute("x1", x1); hb.setAttribute("y1", y1); hb.setAttribute("x2", x2); hb.setAttribute("y2", y2);
-                    hb.setAttribute("stroke", "transparent"); hb.setAttribute("stroke-width", "15");
-                    hb.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'link', i));
-                    lg.appendChild(hb);
-
-                    const line = document.createElementNS(ns, "line");
-                    line.setAttribute("x1", x1); line.setAttribute("y1", y1); line.setAttribute("x2", x2); line.setAttribute("y2", y2);
-                    line.setAttribute("stroke", lnk.color); line.setAttribute("stroke-width", lnk.width);
-                    line.style.pointerEvents = "none";
-                    if (lnk.dashed) line.setAttribute("stroke-dasharray", "5,5");
-                    lg.appendChild(line);
-
-                    if (lnk.type === 'vector') {
-                        const ang = Math.atan2(y2 - y1, x2 - x1); const head = 10 + parseInt(lnk.width);
-                        const ex = x2 - Math.cos(ang) * 3; const ey = y2 - Math.sin(ang) * 3;
-                        const arr = document.createElementNS(ns, "path");
-                        arr.setAttribute("d", `M ${ex} ${ey} L ${ex - head * Math.cos(ang - Math.PI / 6)} ${ey - head * Math.sin(ang - Math.PI / 6)} M ${ex} ${ey} L ${ex - head * Math.cos(ang + Math.PI / 6)} ${ey - head * Math.sin(ang + Math.PI / 6)}`);
-                        arr.setAttribute("stroke", lnk.color); arr.setAttribute("stroke-width", lnk.width); arr.setAttribute("fill", "none");
-                        arr.style.pointerEvents = "none";
-                        lg.appendChild(arr);
-                    }
+                    if (lnk.visible === false) return;
+                    const p1 = this.state.points[lnk.from]; const p2 = this.state.points[lnk.to]; if (!p1 || !p2) return;
+                    const x1 = this.state.axisX + p1.u * this.state.baseUnit; const y1 = this.state.axisY - p1.v * this.state.baseUnit; const x2 = this.state.axisX + p2.u * this.state.baseUnit; const y2 = this.state.axisY - p2.v * this.state.baseUnit;
+                    const lg = document.createElementNS(ns, "g"); lg.style.cursor = "pointer";
+                    const hb = document.createElementNS(ns, "line"); hb.setAttribute("x1", x1); hb.setAttribute("y1", y1); hb.setAttribute("x2", x2); hb.setAttribute("y2", y2); hb.setAttribute("stroke", "transparent"); hb.setAttribute("stroke-width", "15"); hb.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'link', i)); lg.appendChild(hb);
+                    const line = document.createElementNS(ns, "line"); line.setAttribute("x1", x1); line.setAttribute("y1", y1); line.setAttribute("x2", x2); line.setAttribute("y2", y2); line.setAttribute("stroke", lnk.color); line.setAttribute("stroke-width", lnk.width); line.style.pointerEvents = "none"; if (lnk.dashed) line.setAttribute("stroke-dasharray", "5,5"); lg.appendChild(line);
+                    if (lnk.type === 'vector') { const ang = Math.atan2(y2 - y1, x2 - x1); const head = 10 + parseInt(lnk.width); const ex = x2 - Math.cos(ang) * 3; const ey = y2 - Math.sin(ang) * 3; const arr = document.createElementNS(ns, "path"); arr.setAttribute("d", `M ${ex} ${ey} L ${ex - head * Math.cos(ang - Math.PI / 6)} ${ey - head * Math.sin(ang - Math.PI / 6)} M ${ex} ${ey} L ${ex - head * Math.cos(ang + Math.PI / 6)} ${ey - head * Math.sin(ang + Math.PI / 6)}`); arr.setAttribute("stroke", lnk.color); arr.setAttribute("stroke-width", lnk.width); arr.setAttribute("fill", "none"); arr.style.pointerEvents = "none"; lg.appendChild(arr); }
                     linkG.appendChild(lg);
                 });
                 mainGroup.appendChild(linkG);
 
-                // Curves
                 const curvesG = document.createElementNS(ns, "g");
-                this.state.curves.forEach((c, i) => {
-                    const d = app.getSmoothPath(c.pts);
-                    if (d) {
-                        const cg = document.createElementNS(ns, "g");
-                        cg.style.cursor = "pointer";
-                        const path = document.createElementNS(ns, "path");
-                        path.setAttribute("d", d); path.setAttribute("stroke", c.color); path.setAttribute("stroke-width", c.width); path.setAttribute("fill", "none");
-                        if (c.dashed) path.setAttribute("stroke-dasharray", "5,5");
-                        path.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'curve', i));
-                        cg.appendChild(path);
-                        curvesG.appendChild(cg);
-                    }
-                });
+                this.state.curves.forEach((c, i) => { if (c.visible === false) return; const d = app.getSmoothPath(c.pts); if (d) { const cg = document.createElementNS(ns, "g"); cg.style.cursor = "pointer"; const path = document.createElementNS(ns, "path"); path.setAttribute("d", d); path.setAttribute("stroke", c.color); path.setAttribute("stroke-width", c.width); path.setAttribute("fill", "none"); if (c.dashed) path.setAttribute("stroke-dasharray", "5,5"); path.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'curve', i)); cg.appendChild(path); curvesG.appendChild(cg); } });
                 mainGroup.appendChild(curvesG);
-                
-                // Circles
-                const circG = document.createElementNS(ns, "g");
-                if(this.state.circles) {
-                    this.state.circles.forEach((c, i) => {
-                        const p1 = this.state.points[c.center];
-                        const p2 = this.state.points[c.edge];
-                        if(!p1 || !p2) return;
-                        const x1 = this.state.axisX + p1.u * this.state.baseUnit; const y1 = this.state.axisY - p1.v * this.state.baseUnit;
-                        const x2 = this.state.axisX + p2.u * this.state.baseUnit; const y2 = this.state.axisY - p2.v * this.state.baseUnit;
-                        const r = Math.sqrt(Math.pow(x2-x1, 2) + Math.pow(y2-y1, 2));
 
-                        const cg = document.createElementNS(ns, "g");
-                        cg.style.cursor = "pointer";
-                        const path = document.createElementNS(ns, "circle");
-                        path.setAttribute("cx", x1); path.setAttribute("cy", y1); path.setAttribute("r", r);
-                        path.setAttribute("stroke", c.color); path.setAttribute("stroke-width", c.width); path.setAttribute("fill", "none");
-                        if (c.dashed) path.setAttribute("stroke-dasharray", "5,5");
-                        path.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'circle', i));
-                        cg.appendChild(path);
-                        circG.appendChild(cg);
-                    });
-                }
+                const circG = document.createElementNS(ns, "g");
+                if (this.state.circles) { this.state.circles.forEach((c, i) => { if (c.visible === false) return; const p1 = this.state.points[c.center]; const p2 = this.state.points[c.edge]; if (!p1 || !p2) return; const x1 = this.state.axisX + p1.u * this.state.baseUnit; const y1 = this.state.axisY - p1.v * this.state.baseUnit; const x2 = this.state.axisX + p2.u * this.state.baseUnit; const y2 = this.state.axisY - p2.v * this.state.baseUnit; const r = Math.sqrt(Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2)); const cg = document.createElementNS(ns, "g"); cg.style.cursor = "pointer"; const path = document.createElementNS(ns, "circle"); path.setAttribute("cx", x1); path.setAttribute("cy", y1); path.setAttribute("r", r); path.setAttribute("stroke", c.color); path.setAttribute("stroke-width", c.width); path.setAttribute("fill", "none"); if (c.dashed) path.setAttribute("stroke-dasharray", "5,5"); path.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'circle', i)); cg.appendChild(path); circG.appendChild(cg); }); }
                 mainGroup.appendChild(circG);
 
-                // Functions
                 const funcsG = document.createElementNS(ns, "g");
-                this.state.functions.forEach((f, i) => {
-                    const fg = document.createElementNS(ns, "g");
-                    fg.style.cursor = "pointer";
-                    fg.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'function', i));
-                    let d = ""; let started = false;
-                    for (let px = 0; px <= this.state.width; px += 2) {
-                        const logicalX = (px - this.state.axisX) / this.state.baseUnit;
-                        try {
-                            const logicalY = new Function('x', 'return ' + f.safeExpr)(logicalX);
-                            if (isFinite(logicalY)) {
-                                const py = this.state.axisY - logicalY * this.state.baseUnit;
-                                if (py > -100 && py < this.state.height + 100) {
-                                    if (!started) { d += `M ${px} ${py}`; started = true; } else { d += ` L ${px} ${py}`; }
-                                } else { started = false; }
-                            } else { started = false; }
-                        } catch (e) { }
-                    }
-                    const path = document.createElementNS(ns, "path");
-                    path.setAttribute("d", d); path.setAttribute("stroke", f.color); path.setAttribute("stroke-width", f.width); path.setAttribute("fill", "none");
-                    fg.appendChild(path); funcsG.appendChild(fg);
-                });
+                this.state.functions.forEach((f, i) => { if (f.visible === false) return; const fg = document.createElementNS(ns, "g"); fg.style.cursor = "pointer"; fg.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'function', i)); let d = ""; let started = false; for (let px = 0; px <= this.state.width; px += 2) { const logicalX = (px - this.state.axisX) / this.state.baseUnit; try { const logicalY = new Function('x', 'return ' + f.safeExpr)(logicalX); if (isFinite(logicalY)) { const py = this.state.axisY - logicalY * this.state.baseUnit; if (py > -100 && py < this.state.height + 100) { if (!started) { d += `M ${px} ${py}`; started = true; } else { d += ` L ${px} ${py}`; } } else { started = false; } } else { started = false; } } catch (e) { } } const path = document.createElementNS(ns, "path"); path.setAttribute("d", d); path.setAttribute("stroke", f.color); path.setAttribute("stroke-width", f.width); path.setAttribute("fill", "none"); fg.appendChild(path); funcsG.appendChild(fg); });
                 mainGroup.appendChild(funcsG);
 
-                // Points
                 const ptG = document.createElementNS(ns, "g");
-                this.state.points.forEach((pt, i) => {
-                    const cx = this.state.axisX + pt.u * this.state.baseUnit;
-                    const cy = this.state.axisY - pt.v * this.state.baseUnit;
-                    const pg = document.createElementNS(ns, "g");
-                    pg.setAttribute("transform", `translate(${cx}, ${cy})`);
-                    pg.style.cursor = "pointer";
-
-                    const hb = document.createElementNS(ns, "circle");
-                    hb.setAttribute("r", 15); hb.setAttribute("fill", "transparent");
-                    hb.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'point', i));
-                    hb.addEventListener('click', (e) => app.handlePointClick(e, i));
-
-                    hb.addEventListener('mouseenter', () => {
-                        const vis = pg.querySelector('.visual-marker');
-                        if (vis) vis.setAttribute('transform', 'scale(1.5)');
-                    });
-                    hb.addEventListener('mouseleave', () => {
-                        const vis = pg.querySelector('.visual-marker');
-                        if (vis) vis.setAttribute('transform', 'scale(1)');
-                    });
-
-                    pg.appendChild(hb);
-
-                    if ((this.state.interactionMode === 'link' && this.state.tempLinkStart === i) || (this.state.interactionMode === 'circle' && this.state.tempLinkStart === i) || (this.state.interactionMode === 'curve' && this.state.activeCurve.includes(i))) {
-                        const halo = document.createElementNS(ns, "circle");
-                        halo.setAttribute("r", 10); halo.setAttribute("fill", "rgba(52, 152, 219, 0.5)"); halo.style.pointerEvents = "none";
-                        pg.appendChild(halo);
-                    }
-
-                    const visual = document.createElementNS(ns, "g");
-                    visual.classList.add('visual-marker');
-                    visual.style.pointerEvents = "none";
-                    visual.style.transition = "transform 0.15s ease-out";
-
-                    const col = this.state.tempLinkStart === i ? "#3498db" : pt.color;
-                    const s = 4;
-                    let shape = `<path d="M -${s} -${s} L ${s} ${s} M -${s} ${s} L ${s} -${s}" stroke="${col}" stroke-width="2"/>`;
-                    let tx = `<text x="6" y="-6" font-family="Arial" font-size="14" font-weight="bold" fill="${col}">${pt.label}</text>`;
-                    if (pt.showCoords) tx += `<text x="6" y="8" font-family="Arial" font-size="10" fill="#666">(${pt.u}; ${pt.v})</text>`;
-                    visual.innerHTML = shape + tx;
-                    pg.appendChild(visual);
-                    ptG.appendChild(pg);
-                });
+                this.state.points.forEach((pt, i) => { if (pt.visible === false) return; const cx = this.state.axisX + pt.u * this.state.baseUnit; const cy = this.state.axisY - pt.v * this.state.baseUnit; const pg = document.createElementNS(ns, "g"); pg.setAttribute("transform", `translate(${cx}, ${cy})`); pg.style.cursor = "pointer"; const hb = document.createElementNS(ns, "circle"); hb.setAttribute("r", 15); hb.setAttribute("fill", "transparent"); hb.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'point', i)); hb.addEventListener('click', (e) => app.handlePointClick(e, i)); hb.addEventListener('mouseenter', () => { const vis = pg.querySelector('.visual-marker'); if (vis) vis.setAttribute('transform', 'scale(1.5)'); }); hb.addEventListener('mouseleave', () => { const vis = pg.querySelector('.visual-marker'); if (vis) vis.setAttribute('transform', 'scale(1)'); }); pg.appendChild(hb); if ((this.state.interactionMode === 'link' && this.state.tempLinkStart === i) || (this.state.interactionMode === 'circle' && this.state.tempLinkStart === i) || (this.state.interactionMode === 'curve' && this.state.activeCurve.includes(i))) { const halo = document.createElementNS(ns, "circle"); halo.setAttribute("r", 10); halo.setAttribute("fill", "rgba(52, 152, 219, 0.5)"); halo.style.pointerEvents = "none"; pg.appendChild(halo); } const visual = document.createElementNS(ns, "g"); visual.classList.add('visual-marker'); visual.style.pointerEvents = "none"; visual.style.transition = "transform 0.15s ease-out"; const col = this.state.tempLinkStart === i ? "#3498db" : pt.color; const s = 4; let shape = `<path d="M -${s} -${s} L ${s} ${s} M -${s} ${s} L ${s} -${s}" stroke="${col}" stroke-width="2"/>`; let tx = `<text x="6" y="-6" font-family="Arial" font-size="14" font-weight="bold" fill="${col}">${pt.label}</text>`; if (pt.showCoords) tx += `<text x="6" y="8" font-family="Arial" font-size="10" fill="#666">(${pt.u}; ${pt.v})</text>`; visual.innerHTML = shape + tx; pg.appendChild(visual); ptG.appendChild(pg); });
                 mainGroup.appendChild(ptG);
 
-                // Free Texts
                 const textG = document.createElementNS(ns, "g");
-                if(this.state.texts) {
-                    this.state.texts.forEach((t, i) => {
-                          const cx = this.state.axisX + t.u * this.state.baseUnit;
-                          const cy = this.state.axisY - t.v * this.state.baseUnit;
-                          const tg = document.createElementNS(ns, "text");
-                          tg.setAttribute("x", cx); tg.setAttribute("y", cy);
-                          tg.textContent = t.content;
-                          tg.setAttribute("font-family", "Arial");
-                          tg.setAttribute("font-size", "14");
-                          tg.setAttribute("fill", t.color);
-                          tg.style.cursor = "pointer";
-                          tg.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'text', i));
-                          textG.appendChild(tg);
+                if (this.state.texts) { this.state.texts.forEach((t, i) => { if (t.visible === false) return; const cx = this.state.axisX + t.u * this.state.baseUnit; const cy = this.state.axisY - t.v * this.state.baseUnit; const tg = document.createElementNS(ns, "text"); tg.setAttribute("x", cx); tg.setAttribute("y", cy); tg.textContent = t.content; tg.setAttribute("font-family", "Arial"); tg.setAttribute("font-size", "14"); tg.setAttribute("fill", t.color); tg.style.cursor = "pointer"; tg.addEventListener('contextmenu', (e) => app.showCtxMenu(e, 'text', i)); textG.appendChild(tg); }); }
+                mainGroup.appendChild(textG);
+
+                // --- RENDU DES TABLEAUX SVG ---
+                const tableG = document.createElementNS(ns, "g");
+                if (this.state.tables) {
+                    this.state.tables.forEach((t, i) => {
+                        if (t.visible === false) return;
+                        const tg = document.createElementNS(ns, "g");
+                        tg.setAttribute("transform", `translate(${t.pos.x}, ${t.pos.y})`);
+
+                        // EVENT LISTENER POUR LE DRAG DES TABLEAUX
+                        tg.addEventListener('mousedown', (e) => {
+                            if (app.state.interactionMode === 'move') {
+                                e.stopPropagation();
+                                app.drag = {
+                                    active: true,
+                                    mode: 'table',
+                                    idx: i,
+                                    startX: e.clientX,
+                                    startY: e.clientY,
+                                    originX: t.pos.x,
+                                    originY: t.pos.y
+                                };
+                            } else {
+                                if (e.button === 2) { // Clic droit sur tableau
+                                    app.showCtxMenu(e, 'table', i);
+                                }
+                            }
+                        });
+
+                        const hasPrime = t.showFPrime !== false; // Default true
+
+                        // Dimensions
+                        const cellW = 50; const cellH = 30;
+                        const headerW = 60;
+                        const totalW = headerW + (t.x.length * 2 - 1) * cellW;
+                        const totalH = hasPrime ? cellH * 3 : cellH * 2;
+
+                        // Fond blanc + Bordure
+                        const bg = document.createElementNS(ns, "rect");
+                        bg.setAttribute("width", totalW); bg.setAttribute("height", totalH);
+                        bg.setAttribute("fill", "white"); bg.setAttribute("stroke", "black"); bg.setAttribute("stroke-width", "1");
+                        tg.appendChild(bg);
+
+                        // Lignes horizontales
+                        const l1 = document.createElementNS(ns, "line");
+                        l1.setAttribute("x1", 0); l1.setAttribute("y1", cellH); l1.setAttribute("x2", totalW); l1.setAttribute("y2", cellH); l1.setAttribute("stroke", "black");
+                        tg.appendChild(l1);
+
+                        if (hasPrime) {
+                            const l2 = document.createElementNS(ns, "line");
+                            l2.setAttribute("x1", 0); l2.setAttribute("y1", cellH * 2); l2.setAttribute("x2", totalW); l2.setAttribute("y2", cellH * 2); l2.setAttribute("stroke", "black");
+                            tg.appendChild(l2);
+                        }
+
+                        // Ligne verticale Headers
+                        const lv = document.createElementNS(ns, "line");
+                        lv.setAttribute("x1", headerW); lv.setAttribute("y1", 0); lv.setAttribute("x2", headerW); lv.setAttribute("y2", totalH); lv.setAttribute("stroke", "black");
+                        tg.appendChild(lv);
+
+                        // Headers Text
+                        const th1 = document.createElementNS(ns, "text"); th1.textContent = "x"; th1.setAttribute("x", headerW / 2); th1.setAttribute("y", cellH / 2); th1.setAttribute("text-anchor", "middle"); th1.setAttribute("dominant-baseline", "middle"); tg.appendChild(th1);
+
+                        if (hasPrime) {
+                            const th2 = document.createElementNS(ns, "text"); th2.textContent = "f'(x)"; th2.setAttribute("x", headerW / 2); th2.setAttribute("y", cellH * 1.5); th2.setAttribute("text-anchor", "middle"); th2.setAttribute("dominant-baseline", "middle"); tg.appendChild(th2);
+                            const th3 = document.createElementNS(ns, "text"); th3.textContent = "f(x)"; th3.setAttribute("x", headerW / 2); th3.setAttribute("y", cellH * 2.5); th3.setAttribute("text-anchor", "middle"); th3.setAttribute("dominant-baseline", "middle"); tg.appendChild(th3);
+                        } else {
+                            const th3 = document.createElementNS(ns, "text"); th3.textContent = "f(x)"; th3.setAttribute("x", headerW / 2); th3.setAttribute("y", cellH * 1.5); th3.setAttribute("text-anchor", "middle"); th3.setAttribute("dominant-baseline", "middle"); tg.appendChild(th3);
+                        }
+
+                        // Contenu X
+                        let curX = headerW;
+                        t.x.forEach((val, idx) => {
+                            // Valeur X
+                            const txt = document.createElementNS(ns, "text"); txt.textContent = val;
+                            txt.setAttribute("x", curX + cellW / 2); txt.setAttribute("y", cellH / 2); txt.setAttribute("text-anchor", "middle"); txt.setAttribute("dominant-baseline", "middle");
+                            tg.appendChild(txt);
+
+                            // Ligne verticale pointillée sous X
+                            const lvX = document.createElementNS(ns, "line");
+                            lvX.setAttribute("x1", curX + cellW / 2); lvX.setAttribute("y1", cellH); lvX.setAttribute("x2", curX + cellW / 2); lvX.setAttribute("y2", totalH);
+                            lvX.setAttribute("stroke", "#ccc"); lvX.setAttribute("stroke-dasharray", "4,4");
+                            tg.appendChild(lvX);
+
+                            // Valeur f'(x)
+                            if (hasPrime) {
+                                const fprimeVal = t.fprime[idx].val;
+                                if (fprimeVal && fprimeVal !== "") {
+                                    if (fprimeVal === '0' || fprimeVal === '|') {
+                                        const txtP = document.createElementNS(ns, "text"); txtP.textContent = fprimeVal;
+                                        txtP.setAttribute("x", curX + cellW / 2); txtP.setAttribute("y", cellH * 1.5); txtP.setAttribute("text-anchor", "middle"); txtP.setAttribute("dominant-baseline", "middle");
+                                        tg.appendChild(txtP);
+                                    } else if (fprimeVal === '||') {
+                                        // Double barre
+                                        const dbLine = document.createElementNS(ns, "line");
+                                        dbLine.setAttribute("x1", curX + cellW / 2 - 2); dbLine.setAttribute("y1", cellH); dbLine.setAttribute("x2", curX + cellW / 2 - 2); dbLine.setAttribute("y2", totalH);
+                                        dbLine.setAttribute("stroke", "black"); dbLine.setAttribute("stroke-width", "1");
+                                        tg.appendChild(dbLine);
+                                        const dbLine2 = document.createElementNS(ns, "line");
+                                        dbLine2.setAttribute("x1", curX + cellW / 2 + 2); dbLine2.setAttribute("y1", cellH); dbLine2.setAttribute("x2", curX + cellW / 2 + 2); dbLine2.setAttribute("y2", totalH);
+                                        dbLine2.setAttribute("stroke", "black"); dbLine2.setAttribute("stroke-width", "1");
+                                        tg.appendChild(dbLine2);
+                                    }
+                                }
+                            }
+
+                            // Valeur f(x)
+                            const fVal = t.f[idx].val;
+                            const fY = hasPrime ? cellH * 2.5 : cellH * 1.5;
+                            if (fVal && fVal !== "") {
+                                const txtF = document.createElementNS(ns, "text"); txtF.textContent = fVal;
+                                txtF.setAttribute("x", curX + cellW / 2); txtF.setAttribute("y", fY); txtF.setAttribute("text-anchor", "middle"); txtF.setAttribute("dominant-baseline", "middle");
+                                tg.appendChild(txtF);
+                            }
+
+                            // Intervalle après
+                            if (idx < t.x.length - 1) {
+                                curX += cellW;
+
+                                if (hasPrime) {
+                                    const sign = t.fprime[idx].int;
+                                    if (sign) {
+                                        const txtS = document.createElementNS(ns, "text"); txtS.textContent = sign;
+                                        txtS.setAttribute("x", curX + cellW / 2); txtS.setAttribute("y", cellH * 1.5); txtS.setAttribute("text-anchor", "middle"); txtS.setAttribute("dominant-baseline", "middle");
+                                        tg.appendChild(txtS);
+                                    }
+                                }
+
+                                // Flèche f(x)
+                                const arr = t.f[idx].arrow;
+                                if (arr) {
+                                    const ax1 = curX + 10; const ax2 = curX + cellW - 10;
+                                    let ay1, ay2;
+                                    // Limites Y pour les flèches
+                                    const topY = hasPrime ? cellH * 2 + 5 : cellH + 5;
+                                    const botY = totalH - 5;
+
+                                    if (arr === 'up') { ay1 = botY; ay2 = topY; }
+                                    else { ay1 = topY; ay2 = botY; }
+
+                                    const lArr = document.createElementNS(ns, "line");
+                                    lArr.setAttribute("x1", ax1); lArr.setAttribute("y1", ay1); lArr.setAttribute("x2", ax2); lArr.setAttribute("y2", ay2);
+                                    lArr.setAttribute("stroke", "black"); lArr.setAttribute("marker-end", "url(#arrowhead)");
+                                    tg.appendChild(lArr);
+                                }
+                                curX += cellW;
+                            }
+                        });
+
+                        tableG.appendChild(tg);
                     });
                 }
-                mainGroup.appendChild(textG);
+                mainGroup.appendChild(tableG);
 
                 svg.appendChild(mainGroup);
 
                 const gh = document.createElementNS(ns, "g"); gh.setAttribute("id", "ghost-layer");
                 svg.appendChild(gh);
+
+                // Defs pour flèches SVG
+                const marker = document.createElementNS(ns, "marker");
+                marker.setAttribute("id", "arrowhead"); marker.setAttribute("markerWidth", "10"); marker.setAttribute("markerHeight", "7"); marker.setAttribute("refX", "9"); marker.setAttribute("refY", "3.5"); marker.setAttribute("orient", "auto");
+                const poly = document.createElementNS(ns, "polygon"); poly.setAttribute("points", "0 0, 10 3.5, 0 7");
+                marker.appendChild(poly); defs.appendChild(marker);
 
                 this.ui.wrapper.insertBefore(svg, this.ui.wrapper.firstChild);
                 this.renderObjectList();
