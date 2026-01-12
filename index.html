@@ -884,6 +884,7 @@
                 <select id="exportFormat">
                     <option value="png" selected>Image (PNG)</option>
                     <option value="svg">Vecteur (SVG)</option>
+                    <option value="tikz">Code LaTeX (TikZ)</option>
                 </select>
             </div>
             <div class="input-group" id="qualityControl">
@@ -1410,11 +1411,29 @@
             openExportModal: function () { document.getElementById('export-modal').style.display = 'flex'; },
             openHelpModal: function () { document.getElementById('help-modal').style.display = 'flex'; },
             
-            performExport: function (action) {
+         performExport: function (action) {
+                const format = document.getElementById('exportFormat').value;
+
+                // --- CAS TIKZ / LATEX ---
+                if (format === 'tikz') {
+                    const code = this.generateTikZ();
+                    if (action === 'copy') {
+                        navigator.clipboard.writeText(code).then(() => app.showToast("Code LaTeX copié !"));
+                    } else {
+                        const blob = new Blob([code], { type: 'text/plain' });
+                        const link = document.createElement('a');
+                        link.href = URL.createObjectURL(blob);
+                        link.download = "figure.tex";
+                        link.click();
+                    }
+                    document.getElementById('export-modal').style.display = 'none';
+                    return;
+                }
+
+                // --- CAS PNG / SVG (Existant) ---
                 const currentZoom = this.state.viewZoom;
                 this.state.viewZoom = 1; this.applyZoomCSS();
-
-                const format = document.getElementById('exportFormat').value;
+                
                 const scale = parseInt(document.getElementById('exportQuality').value);
                 const svgEl = this.ui.wrapper.querySelector('svg');
 
@@ -1449,9 +1468,165 @@
                     img.src = url;
                 }
                 this.state.viewZoom = currentZoom; this.applyZoomCSS();
-                document.getElementById('export-modal').style.display='none';
+                document.getElementById('export-modal').style.display = 'none';
             },
 
+            // --- NOUVELLE FONCTION TIKZ ---
+// --- FONCTION TIKZ FINALE ET CORRIGÉE ---
+        // --- FONCTION TIKZ (Épaisseurs précises en 'pt') ---
+            generateTikZ: function () {
+                const minU = -this.state.axisX / this.state.baseUnit;
+                const maxU = (this.state.width - this.state.axisX) / this.state.baseUnit;
+                const maxV = this.state.axisY / this.state.baseUnit; 
+                const minV = (this.state.axisY - this.state.height) / this.state.baseUnit; 
+
+                const colorsUsed = new Set();
+                const getColor = (hex) => {
+                    if (!hex) return 'black';
+                    hex = hex.toLowerCase();
+                    if (hex === '#000000' || hex === 'black') return 'black';
+                    if (hex === '#ffffff' || hex === 'white') return 'white';
+                    if (hex === '#ff0000') return 'red';
+                    if (hex === '#00ff00') return 'green';
+                    if (hex === '#0000ff') return 'blue';
+                    const cName = "c" + hex.replace('#', '');
+                    colorsUsed.add(hex);
+                    return cName;
+                };
+
+                // Conversion Pixel -> Point LaTeX (ajustable si besoin)
+                // On met un ratio de 0.8 pour que ce soit fidèle à l'écran
+                const getWidth = (w) => (w * 0.8).toFixed(2);
+                const fmt = (n) => n.toFixed(2); 
+
+                let content = "";
+                
+                // 1. Grille (Utilise maintenant l'épaisseur "w" de la couche)
+                this.state.layers.forEach(l => {
+                   const step = l.m;
+                   const col = getColor(l.c);
+                   const width = getWidth(l.w); // Récupère l'épaisseur configurée
+                   
+                   // On construit le style manuellement avec line width
+                   let style = `, line width=${width}pt`;
+                   if (l.s === 'dash') style += ', dashed';
+                   if (l.s === 'dot') style += ', dotted';
+                   if (l.s === 'shortdash') style += ', dash pattern=on 2pt off 2pt'; // Custom pour courts
+                   
+                   const startX = Math.floor(minU/step)*step;
+                   const endX = Math.ceil(maxU/step)*step;
+                   const startY = Math.floor(minV/step)*step;
+                   const endY = Math.ceil(maxV/step)*step;
+                   
+                   content += `    % Grille ${l.name}\n`;
+                   content += `    \\draw[color=${col}, step=${step}${style}] (${fmt(startX)},${fmt(startY)}) grid (${fmt(endX)},${fmt(endY)});\n`;
+                });
+
+                // 2. Axes
+                if(this.state.showAxes) {
+                    content += `    % Axes\n`;
+                    // Axes fixés à 1.2pt pour être bien visibles
+                    content += `    \\draw[->, line width=1.2pt] (${fmt(minU)},0) -- (${fmt(maxU)},0) node[right] {$x$};\n`;
+                    content += `    \\draw[->, line width=1.2pt] (0,${fmt(minV)}) -- (0,${fmt(maxV)}) node[above] {$y$};\n`;
+                    
+                    if(this.state.showLabels) {
+                         const startX = Math.ceil(minU); const endX = Math.floor(maxU);
+                         for(let i=startX; i<=endX; i++) {
+                             if(i!==0) content += `    \\draw (${i},0.1) -- (${i},-0.1) node[below] {\\small ${i}};\n`;
+                         }
+                         const startY = Math.ceil(minV); const endY = Math.floor(maxV);
+                         for(let i=startY; i<=endY; i++) {
+                             if(i!==0) content += `    \\draw (0.1,${i}) -- (-0.1,${i}) node[left] {\\small ${i}};\n`;
+                         }
+                    }
+                }
+
+                // 3. Objets géométriques
+                content += `    % Objets\n`;
+                
+                // Lignes
+                this.state.links.forEach(l => {
+                    const p1 = this.state.points[l.from];
+                    const p2 = this.state.points[l.to];
+                    const col = getColor(l.color);
+                    const style = l.dashed ? ', dashed' : '';
+                    const arrow = l.type === 'vector' ? ', ->, >=latex' : '';
+                    // On utilise line width explicite
+                    content += `    \\draw[color=${col}, line width=${getWidth(l.width)}pt${style}${arrow}] (${p1.u},${p1.v}) -- (${p2.u},${p2.v});\n`;
+                });
+
+                // Cercles
+                if(this.state.circles) {
+                    this.state.circles.forEach(c => {
+                        const p1 = this.state.points[c.center];
+                        const p2 = this.state.points[c.edge];
+                        const r = Math.sqrt(Math.pow(p2.u - p1.u, 2) + Math.pow(p2.v - p1.v, 2));
+                        const col = getColor(c.color);
+                        const style = c.dashed ? ', dashed' : '';
+                        content += `    \\draw[color=${col}, line width=${getWidth(c.width)}pt${style}] (${p1.u},${p1.v}) circle (${fmt(r)});\n`;
+                    });
+                }
+
+                // Courbes (Splines)
+                this.state.curves.forEach(c => {
+                     const col = getColor(c.color);
+                     const style = c.dashed ? ', dashed' : '';
+                     let ptsStr = "";
+                     c.pts.forEach(pid => {
+                         const p = this.state.points[pid];
+                         ptsStr += `(${p.u},${p.v}) `;
+                     });
+                     content += `    \\draw[color=${col}, line width=${getWidth(c.width)}pt${style}] plot [smooth, tension=0.7] coordinates { ${ptsStr} };\n`;
+                });
+
+                // Fonctions
+                this.state.functions.forEach(f => {
+                    const col = getColor(f.color);
+                    let expr = f.expr.replace(/\*\*/g, '^');
+                    expr = expr.replace(/(^|[^a-zA-Z\\])x([^a-zA-Z]|$)/g, '$1\\x$2');
+                    expr = expr.replace(/sin\(\\x\)/g, 'sin(\\x r)')
+                               .replace(/cos\(\\x\)/g, 'cos(\\x r)')
+                               .replace(/tan\(\\x\)/g, 'tan(\\x r)');
+
+                    content += `    \\draw[color=${col}, line width=${getWidth(f.width)}pt, samples=100, smooth, domain=${fmt(minU)}:${fmt(maxU)}] plot (\\x, {${expr}});\n`;
+                });
+
+                // Points (Croix avec épaisseur explicite)
+                this.state.points.forEach(p => {
+                    const col = getColor(p.color);
+                    const s = 0.15; 
+                    const x = p.u; const y = p.v;
+                    const x1 = fmt(x - s); const x2 = fmt(x + s);
+                    const y1 = fmt(y - s); const y2 = fmt(y + s);
+                    
+                    content += `    % Point ${p.label}\n`;
+                    // line width=1.2pt pour des croix bien visibles
+                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y1}) -- (${x2},${y2});\n`; 
+                    content += `    \\draw[color=${col}, line width=1.2pt] (${x1},${y2}) -- (${x2},${y1});\n`; 
+                    content += `    \\node[color=${col}] at (${fmt(x + 0.2)},${fmt(y + 0.2)}) {${p.label}};\n`;
+                });
+
+                // Textes
+                if(this.state.texts) {
+                    this.state.texts.forEach(t => {
+                        const col = getColor(t.color);
+                        const safeText = t.content.replace(/_/g, '\\_').replace(/%/g, '\\%');
+                        content += `    \\node[color=${col}, anchor=center] at (${t.u},${t.v}) {${safeText}};\n`;
+                    });
+                }
+
+                let head = `\\begin{tikzpicture}[line cap=round, line join=round]\n`;
+                colorsUsed.forEach(hex => {
+                     const cName = "c" + hex.replace('#', '');
+                     let cleanHex = hex.replace('#', '');
+                     if(cleanHex.length === 3) cleanHex = cleanHex.split('').map(c => c+c).join('');
+                     head += `    \\definecolor{${cName}}{HTML}{${cleanHex.toUpperCase()}}\n`;
+                });
+                
+                head += `    \\clip (${fmt(minU)},${fmt(minV)}) rectangle (${fmt(maxU)},${fmt(maxV)});\n`;
+
+                return head + content + `\\end{tikzpicture}`;
+            },
             showToast: function (msg) {
                 const t = document.getElementById('toast');
                 t.textContent = msg || "Opération effectuée";
