@@ -301,6 +301,43 @@
     <div id="help-modal" class="modal"><div class="modal-content large"><div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:1px solid #f1f2f6; padding-bottom:10px;"><div style="font-size:1.2rem; font-weight:800;">Aide & Raccourcis</div><button onclick="document.getElementById('help-modal').style.display='none'" style="border:none; background:none; cursor:pointer; font-size:1.5rem; color:#b2bec3;">×</button></div><table class="shortcuts-table"><tr><td>Ctrl + Z / Y</td><td>Annuler / Rétablir</td></tr><tr><td>M</td><td>Outil Déplacement</td></tr><tr><td>P</td><td>Placer un Point</td></tr><tr><td>L</td><td>Ligne / Segment</td></tr><tr><td>S</td><td>Courbe Spline</td></tr><tr><td>C</td><td>Cercle</td></tr><tr><td>T</td><td>Texte Libre</td></tr><tr><td>Clic Droit</td><td>Modifier</td></tr></table></div></div>
     <div id="toast" class="toast">Opération effectuée</div>
     <div id="fileLoader" style="display:none;"><input type="file" onchange="app.handleFileLoad(this)"></div>
+    <div id="donate-widget-container" style="font-family: 'Segoe UI', sans-serif;">
+    
+    <button onclick="document.getElementById('geo-donate-modal').style.display='flex'" style="position:fixed; bottom:20px; right:20px; background-color:#c0392b; color:white; border:none; padding:12px 20px; border-radius:50px; cursor:pointer; font-weight:bold; font-size:15px; display:flex; align-items:center; gap:8px; box-shadow:0 4px 15px rgba(0,0,0,0.3); z-index:9999; transition: transform 0.2s;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+        <span>Soutenir</span>
+    </button>
+
+    <div id="geo-donate-modal" onclick="if(event.target===this) this.style.display='none'" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); z-index:10000; justify-content:center; align-items:center; backdrop-filter:blur(2px);">
+        <div style="background:white; padding:30px; border-radius:12px; width:90%; max-width:420px; text-align:center; box-shadow:0 10px 30px rgba(0,0,0,0.3); position:relative; animation: popIn 0.3s ease-out;">
+            
+            <button onclick="document.getElementById('geo-donate-modal').style.display='none'" style="position:absolute; top:10px; right:15px; background:none; border:none; font-size:24px; color:#999; cursor:pointer;">&times;</button>
+            
+            <h3 style="margin-top:0; color:#c0392b; font-size:20px;">Un petit coup de pouce ? ☕</h3>
+            <p style="font-size:14px; color:#555; line-height:1.6; margin: 20px 0;">
+                ProfStudio est 100% gratuit, sans publicité et développé sur mon temps libre.<br><br>
+                Si l'outil vous est utile, vous pouvez <strong>m'offrir un café</strong>. C'est le meilleur moyen de me dire merci et de m'encourager pour la suite !
+            </p>
+            
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:25px;">
+                <button onclick="document.getElementById('geo-donate-modal').style.display='none'" style="background:#f1f1f1; color:#555; border:none; padding:10px 20px; border-radius:6px; cursor:pointer;">Plus tard</button>
+                <a href="https://www.paypal.com/donate/?hosted_button_id=VKZXDC5BM2GHA" target="_blank" onclick="document.getElementById('geo-donate-modal').style.display='none'" style="background:#0070ba; color:white; text-decoration:none; padding:10px 20px; border-radius:6px; font-weight:bold; display:inline-flex; align-items:center;">Faire un don PayPal</a>
+            </div>
+
+            <hr style="border:0; border-top:1px solid #eee; margin: 20px 0;">
+
+            <p style="font-size:13px; color:#777;">
+                Un bug ? Une suggestion ?<br>
+                <a href="#" 
+                   onclick="this.href='mailto:' + 'devoddere.math' + '@' + 'gmail.com'; return true;"
+                   style="color:#2980b9; text-decoration:none; font-weight:bold;">
+                   ✉️ Me contacter
+                </a>
+            </p>
+            
+        </div>
+    </div>
+</div>
     <script>
     const app = {
         state: {
